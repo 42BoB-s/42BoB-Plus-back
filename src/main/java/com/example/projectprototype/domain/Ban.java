@@ -11,7 +11,6 @@ import javax.persistence.*;
 public class Ban {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
