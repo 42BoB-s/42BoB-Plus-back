@@ -1,0 +1,10 @@
+insert into menu (menuname) values ('한식');
+insert into menu (menuname) values ('중식');
+insert into menu (menuname) values ('일식');
+insert into menu (menuname) values ('분식');
+insert into menu (menuname) values ('배달음식');
+insert into menu (menuname) values ('도시락');
+insert into menu (menuname) values ('빵');
+insert into menu (menuname) values ('커피');
+insert into menu (menuname) values ('술');
+insert into menu (menuname) values ('편의점');
