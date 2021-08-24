@@ -7,11 +7,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "roommenu")
-@Getter
-@Setter
+@Getter @Setter
 public class RoomMenu {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
