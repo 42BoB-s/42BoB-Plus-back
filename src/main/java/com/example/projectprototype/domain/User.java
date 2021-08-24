@@ -15,6 +15,8 @@ public class User {
     @Column(name = "userid")
     private String userId;
     private String role;
+    
+    @Lob
     private String profile;
 
     // banlist.banuserid 와의 연관관계 설정
