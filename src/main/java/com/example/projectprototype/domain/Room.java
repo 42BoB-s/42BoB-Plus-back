@@ -27,7 +27,10 @@ public class Room {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "meettime")
     private Date meetTime;
+
+    @Enumerated(EnumType.STRING)
     private Location location;
+    
     private int capacity;
 
     @ManyToOne
