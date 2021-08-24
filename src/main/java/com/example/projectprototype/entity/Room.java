@@ -1,12 +1,11 @@
-package com.example.projectprototype.domain;
+package com.example.projectprototype.entity;
 
-import com.example.projectprototype.domain.enums.Location;
-import com.example.projectprototype.domain.enums.RoomStatus;
+import com.example.projectprototype.entity.enums.Location;
+import com.example.projectprototype.entity.enums.RoomStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

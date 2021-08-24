@@ -1,6 +1,6 @@
 package com.example.projectprototype.repository;
 
-import com.example.projectprototype.domain.Room;
+import com.example.projectprototype.entity.Room;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

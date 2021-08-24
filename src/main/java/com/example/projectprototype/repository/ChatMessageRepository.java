@@ -1,11 +1,10 @@
 package com.example.projectprototype.repository;
 
-import com.example.projectprototype.domain.ChatMessage;
-import com.example.projectprototype.domain.Room;
-import com.example.projectprototype.domain.enums.MessageType;
+import com.example.projectprototype.entity.ChatMessage;
+import com.example.projectprototype.entity.Room;
+import com.example.projectprototype.entity.enums.MessageType;
 import org.springframework.data.repository.CrudRepository;
 
-import java.awt.*;
 import java.util.List;
 
 public interface ChatMessageRepository extends CrudRepository<ChatMessage, Long> {

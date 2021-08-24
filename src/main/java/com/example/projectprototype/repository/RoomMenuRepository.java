@@ -1,8 +1,8 @@
 package com.example.projectprototype.repository;
 
-import com.example.projectprototype.domain.Menu;
-import com.example.projectprototype.domain.Room;
-import com.example.projectprototype.domain.RoomMenu;
+import com.example.projectprototype.entity.Menu;
+import com.example.projectprototype.entity.Room;
+import com.example.projectprototype.entity.RoomMenu;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

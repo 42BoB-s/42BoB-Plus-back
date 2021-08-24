@@ -1,10 +1,10 @@
 package com.example.projectprototype.dbcrudtest;
 
-import com.example.projectprototype.domain.*;
-import com.example.projectprototype.domain.enums.Location;
-import com.example.projectprototype.domain.enums.MenuName;
-import com.example.projectprototype.domain.enums.MessageType;
-import com.example.projectprototype.domain.enums.RoomStatus;
+import com.example.projectprototype.entity.*;
+import com.example.projectprototype.entity.enums.Location;
+import com.example.projectprototype.entity.enums.MenuName;
+import com.example.projectprototype.entity.enums.MessageType;
+import com.example.projectprototype.entity.enums.RoomStatus;
 import com.example.projectprototype.repository.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

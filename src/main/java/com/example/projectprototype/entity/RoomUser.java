@@ -1,4 +1,4 @@
-package com.example.projectprototype.domain;
+package com.example.projectprototype.entity;
 
 import lombok.Getter;
 import lombok.Setter;

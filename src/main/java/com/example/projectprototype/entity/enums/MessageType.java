@@ -1,4 +1,4 @@
-package com.example.projectprototype.domain.enums;
+package com.example.projectprototype.entity.enums;
 
 public enum MessageType {
     enter, text, leave
