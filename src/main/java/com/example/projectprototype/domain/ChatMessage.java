@@ -12,7 +12,6 @@ import javax.persistence.*;
 public class ChatMessage {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -22,6 +21,7 @@ public class ChatMessage {
 
     private String writer;
     private String message;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "messagetype")
     private MessageType messageType;
