@@ -9,8 +9,8 @@ import javax.persistence.*;
 @Table(name = "roomuser")
 @Getter @Setter
 public class RoomUser {
+    
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
