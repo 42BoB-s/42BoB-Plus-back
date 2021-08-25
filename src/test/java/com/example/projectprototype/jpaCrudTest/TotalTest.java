@@ -163,7 +163,7 @@ public class TotalTest {
     }
 
     @Test
-    void roomUserMappingTest() {
+    void participantMappingTest() {
         ArrayList<User> userList = new ArrayList<>();
         userList.add(createTestUser("tjeong", "/img/tjeong", "1"));
         userList.add(createTestUser("tjeong2", "/img/tjeong2", "1"));
