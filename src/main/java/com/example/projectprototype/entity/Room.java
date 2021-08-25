@@ -6,25 +6,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "room")
 @Getter
 @Setter
-public class Room {
+public class Room extends TimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 45)
     private String title;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "meettime")
-    private Date meetTime;
+    @Column(columnDefinition = "DATETIME")
+    private LocalDateTime meetTime;
 
     @Enumerated(EnumType.STRING)
     private Location location;
@@ -37,8 +37,11 @@ public class Room {
 
     private RoomStatus status;
 
+    @Lob
+    private String announcement;
+
     @OneToMany(mappedBy = "room")
-    private List<RoomUser> roomUserList = new ArrayList<>();
+    private List<Participant> participantList = new ArrayList<>();
 
     @OneToMany(mappedBy = "room")
     private List<RoomMenu> roomMenuList = new ArrayList<>();
@@ -48,16 +51,16 @@ public class Room {
 
     public void setOwner(User user) {
         if (this.owner != null) {
-            this.owner.getRoomOwnerList().remove(this);
+            this.owner.getOwnerList().remove(this);
         }
         this.owner = user;
-        user.getRoomOwnerList().add(this);
+        user.getOwnerList().add(this);
     }
 
-    public void addRoomUser(RoomUser roomUser) {
-        this.roomUserList.add(roomUser);
-        if (roomUser.getRoom() != this) {
-            roomUser.setRoom(this);
+    public void addRoomUser(Participant participant) {
+        this.participantList.add(participant);
+        if (participant.getRoom() != this) {
+            participant.setRoom(this);
         }
     }
 

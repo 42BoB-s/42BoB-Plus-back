@@ -8,17 +8,17 @@ import javax.persistence.*;
 @Entity
 @Table(name = "roommenu")
 @Getter @Setter
-public class RoomMenu {
+public class RoomMenu extends TimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "roomid")
+    @JoinColumn(name = "room_id")
     private Room room;
 
     @ManyToOne
-    @JoinColumn(name = "menuid")
+    @JoinColumn(name = "menu_id")
     private Menu menu;
 
     public void setRoom(Room room) {

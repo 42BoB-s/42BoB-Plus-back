@@ -6,35 +6,35 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "roomuser")
+@Table(name = "participant")
 @Getter @Setter
-public class RoomUser {
+public class Participant extends TimeEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "roomid")
+    @JoinColumn(name = "room_id")
     private Room room;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
 
     public void setUser(User user) {
         if (this.user != null) {
-            this.user.getRoomUserList().remove(this);
+            this.user.getParticipantList().remove(this);
         }
         this.user = user;
-        user.getRoomUserList().add(this);
+        user.getParticipantList().add(this);
     }
 
     public void setRoom(Room room) {
         if (this.room != null) {
-            this.room.getRoomUserList().remove(this);
+            this.room.getParticipantList().remove(this);
         }
         this.room = room;
-        room.getRoomUserList().add(this);
+        room.getParticipantList().add(this);
     }
 }

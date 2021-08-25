@@ -10,38 +10,56 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 @Getter @Setter
-public class User {
+public class User extends TimeEntity {
     @Id
-    @Column(name = "userid")
-    private String userId;
+    @Column(length = 45)
+    private String id;
+
+    @Column(length = 45)
     private String role;
     
     @Lob
     private String profile;
 
-    // banlist.banuserid 와의 연관관계 설정
     @OneToMany(mappedBy = "src")
-    private List<Ban> banList = new ArrayList<>();
+    private List<Ban> banSrcList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dest")
+    private List<Ban> banDestList = new ArrayList<>();
 
     // room.owner 와의 연관관계 설정
     @OneToMany(mappedBy = "owner")
-    private List<Room> roomOwnerList = new ArrayList<>();
+    private List<Room> ownerList = new ArrayList<>();
 
     // room 에 참여한 정보
     @OneToMany(mappedBy = "user")
-    private List<RoomUser> roomUserList = new ArrayList<>();
+    private List<Participant> participantList = new ArrayList<>();
 
-    public void addBan(Ban ban) {
-        this.banList.add(ban);
+    public void addBanSrc(Ban ban) {
+        this.banSrcList.add(ban);
         if (ban.getSrc() != this) {
             ban.setSrc(this);
         }
     }
 
-    public void addRoomUser(RoomUser roomUser) {
-        this.roomUserList.add(roomUser);
-        if (roomUser.getUser() != this) {
-            roomUser.setUser(this);
+    public void addBanDest(Ban ban) {
+        this.banDestList.add(ban);
+        if (ban.getDest() != this) {
+            ban.setDest(this);
+        }
+    }
+
+    public void addOwner(Room room) {
+        this.ownerList.add(room);
+        if (room.getOwner() != this) {
+            room.setOwner(this);
+        }
+    }
+
+    public void addParticipant(Participant participant) {
+        this.participantList.add(participant);
+        if (participant.getUser() != this) {
+            participant.setUser(this);
         }
     }
 }

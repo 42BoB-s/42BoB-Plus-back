@@ -1,4 +1,4 @@
-package com.example.projectprototype.dbcrudtest;
+package com.example.projectprototype.jpaCrudTest;
 
 import com.example.projectprototype.entity.*;
 import com.example.projectprototype.entity.enums.Location;
@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ public class TotalTest {
     @Autowired
     private RoomRepository roomRepository;
     @Autowired
-    private RoomUserRepository roomUserRepository;
+    private ParticipantRepository participantRepository;
     @Autowired
     private MenuRepository menuRepository;
     @Autowired
@@ -47,7 +47,7 @@ public class TotalTest {
         // user 조회
         Optional<User> user2 = userRepository.findById("tjeong");
         Assertions.assertThat(user2.isEmpty()).isEqualTo(false);
-        Assertions.assertThat(user2.get().getUserId()).isEqualTo("tjeong");
+        Assertions.assertThat(user2.get().getId()).isEqualTo("tjeong");
 
         // user 삭제
         userRepository.delete(user2.get());
@@ -117,8 +117,8 @@ public class TotalTest {
 
     @Test
     void menuCrudTest(){
-        Menu menu = menuRepository.findByMenuName(MenuName.중식);
-        Assertions.assertThat(menu.getMenuName()).isEqualTo(MenuName.중식);
+        Menu menu = menuRepository.findByName(MenuName.중식);
+        Assertions.assertThat(menu.getName()).isEqualTo(MenuName.중식);
     }
 
 
@@ -130,17 +130,16 @@ public class TotalTest {
         Ban ban = new Ban();
 
         ban.setSrc(user);
-        ban.setDest("fake1");
+        //ban.setDest("fake1");
         banRepository.save(ban);
         userRepository.save(user);
 
         Optional<User> user2 = userRepository.findById("tjeong");
-        String src = user2.get().getBanList().get(0).getSrc().getUserId();
-        String dest = user2.get().getBanList().get(0).getDest();
+        String src = user2.get().getBanSrcList().get(0).getSrc().getId();
+        String dest = user2.get().getBanDestList().get(0).getDest().getId();
         Assertions.assertThat(src).isEqualTo("tjeong");
         Assertions.assertThat(dest).isEqualTo("fake1");
     }
-
 
     @Test
     void RoomAndMenuMappingTest() {
@@ -155,11 +154,11 @@ public class TotalTest {
         RoomMenu roomMenu = new RoomMenu();
         roomMenu.setRoom(room);
 
-        roomMenu.setMenu(menuRepository.findByMenuName(MenuName.중식));
+        roomMenu.setMenu(menuRepository.findByName(MenuName.중식));
         roomMenuRepository.save(roomMenu);
 
         RoomMenu roomMenu2 = roomMenuRepository.findByRoom(room).get();
-        Assertions.assertThat(roomMenu2.getMenu().getMenuName()).isEqualTo(MenuName.중식);
+        Assertions.assertThat(roomMenu2.getMenu().getName()).isEqualTo(MenuName.중식);
 
     }
 
@@ -177,19 +176,19 @@ public class TotalTest {
         room.setOwner(userList.get(0));
         roomRepository.save(room);
 
-        RoomUser roomUser = new RoomUser();
-        roomUser.setRoom(room);
-        roomUser.setUser(userList.get(0));
+        Participant participant = new Participant();
+        participant.setRoom(room);
+        participant.setUser(userList.get(0));
 
-        roomUserRepository.save(roomUser);
+        participantRepository.save(participant);
 
-        roomUserRepository.findByRoom(room);
+        participantRepository.findByRoom(room);
 
     }
 
     static User createTestUser(String userId, String profile, String role) {
         User user = new User();
-        user.setUserId(userId);
+        user.setId(userId);
         user.setProfile(profile);
         user.setRole(role);
         return user;
@@ -200,7 +199,7 @@ public class TotalTest {
         room.setTitle("hello");
         room.setLocation(Location.서초);
         room.setStatus(RoomStatus.active);
-        room.setMeetTime(new Date());
+        room.setMeetTime(LocalDateTime.now());
         return room;
     }
 }

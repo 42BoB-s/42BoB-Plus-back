@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "chatmessage")
 @Getter @Setter
-public class ChatMessage {
+public class ChatMessage extends TimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

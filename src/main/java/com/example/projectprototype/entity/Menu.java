@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "menu")
 @Getter @Setter
-public class Menu {
+public class Menu extends TimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +19,7 @@ public class Menu {
 
     @Column(name = "menuname")
     @Enumerated(EnumType.STRING)
-    private MenuName menuName;
+    private MenuName name;
 
     @OneToMany(mappedBy = "menu")
     private List<RoomMenu> roomMenuList = new ArrayList<>();

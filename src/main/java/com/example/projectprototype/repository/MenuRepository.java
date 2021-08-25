@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface MenuRepository extends CrudRepository<Menu, Long> {
 
-    Menu findByMenuName(MenuName menuName);
+    Menu findByName(MenuName menuName);
 }

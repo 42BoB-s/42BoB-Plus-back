@@ -8,24 +8,31 @@ import javax.persistence.*;
 @Entity
 @Table(name = "banlist")
 @Getter @Setter
-public class Ban {
+public class Ban extends TimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "banuserid")
     private User src;
 
-    @Column(name = "baneduserid")
-    private String dest;
+    @ManyToOne
+    private User dest;
 
-    public void setSrc(User user) {
+    public void setSrc(User srcUser) {
         if (this.src != null) {
-            this.src.getBanList().remove(this);
+            this.src.getBanSrcList().remove(this);
         }
-        this.src = user;
-        user.getBanList().add(this);
+        this.src = srcUser;
+        srcUser.getBanSrcList().add(this);
+    }
+
+    public void setDest(User destUser) {
+        if (this.dest != null) {
+            this.dest.getBanDestList().remove(this);
+        }
+        this.dest = destUser;
+        destUser.getBanDestList().add(this);
     }
 }
