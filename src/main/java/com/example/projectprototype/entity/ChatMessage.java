@@ -16,14 +16,13 @@ public class ChatMessage extends TimeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "roomid")
+    @JoinColumn(name = "room_id")
     private Room room;
 
     private String writer;
     private String message;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "messagetype")
     private MessageType messageType;
 
     public void setRoom(Room room) {

@@ -17,7 +17,7 @@ public class Menu extends TimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "menuname")
+    @Column(length = 45)
     @Enumerated(EnumType.STRING)
     private MenuName name;
 

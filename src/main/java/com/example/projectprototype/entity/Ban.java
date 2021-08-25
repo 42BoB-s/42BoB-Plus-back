@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "banlist")
+@Table(name = "ban")
 @Getter @Setter
 public class Ban extends TimeEntity {
 

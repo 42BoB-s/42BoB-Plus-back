@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "roommenu")
+@Table(name = "room_menu")
 @Getter @Setter
 public class RoomMenu extends TimeEntity {
     @Id

@@ -125,18 +125,22 @@ public class TotalTest {
     @Test
     void BanCrud() {
         User user = createTestUser("tjeong", "/img/tjeong", "1");
+        User destUser = createTestUser("fake1", "/img/fake1", "1");
         userRepository.save(user);
+        userRepository.save(destUser);
 
         Ban ban = new Ban();
 
         ban.setSrc(user);
-        //ban.setDest("fake1");
+        ban.setDest(destUser);
         banRepository.save(ban);
         userRepository.save(user);
+        userRepository.save(destUser);
 
         Optional<User> user2 = userRepository.findById("tjeong");
+        Optional<User> user3 = userRepository.findById("fake1");
         String src = user2.get().getBanSrcList().get(0).getSrc().getId();
-        String dest = user2.get().getBanDestList().get(0).getDest().getId();
+        String dest = user3.get().getBanDestList().get(0).getDest().getId();
         Assertions.assertThat(src).isEqualTo("tjeong");
         Assertions.assertThat(dest).isEqualTo("fake1");
     }
@@ -163,7 +167,7 @@ public class TotalTest {
     }
 
     @Test
-    void roomUserMappingTest() {
+    void participantMappingTest() {
         ArrayList<User> userList = new ArrayList<>();
         userList.add(createTestUser("tjeong", "/img/tjeong", "1"));
         userList.add(createTestUser("tjeong2", "/img/tjeong2", "1"));
@@ -199,6 +203,7 @@ public class TotalTest {
         room.setTitle("hello");
         room.setLocation(Location.서초);
         room.setStatus(RoomStatus.active);
+        room.setAnnouncement("sample");
         room.setMeetTime(LocalDateTime.now());
         return room;
     }
