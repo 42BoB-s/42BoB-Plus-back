@@ -38,7 +38,7 @@ public class Room extends TimeEntity {
     private RoomStatus status;
 
     @Lob
-    private String announcement;
+    private String announcement; //? announcement 가 ChatRoom 이 아니라 Room에 있는게 맞나?
 
     @OneToMany(mappedBy = "room")
     private List<Participant> participantList = new ArrayList<>();
