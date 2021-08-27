@@ -11,5 +11,5 @@ import java.util.List;
 public interface RoomRepository extends CrudRepository<Room, Long> {
 
     List<Room> findAll();
-    Room findByIdAndStatus(Room room, RoomStatus status);
+    Room findByIdAndStatus(Long id, RoomStatus status);
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -157,13 +158,24 @@ public class TotalTest {
 
         RoomMenu roomMenu = new RoomMenu();
         roomMenu.setRoom(room);
-
         roomMenu.setMenu(menuRepository.findByName(MenuName.중식));
         roomMenuRepository.save(roomMenu);
 
-        RoomMenu roomMenu2 = roomMenuRepository.findByRoom(room).get();
-        Assertions.assertThat(roomMenu2.getMenu().getName()).isEqualTo(MenuName.중식);
+        roomMenu = new RoomMenu();
+        roomMenu.setRoom(room);
+        roomMenu.setMenu(menuRepository.findByName(MenuName.커피));
+        roomMenuRepository.save(roomMenu);
 
+        List<RoomMenu> roomMenu2 = roomMenuRepository.findByRoom(room).get();
+        Assertions.assertThat(roomMenu2.get(0).getMenu().getName()).isEqualTo(MenuName.중식);
+
+        Optional<Room> room2 = roomRepository.findById(room.getId());
+
+        Assertions.assertThat(room2.get().getRoomMenuList().get(0).getMenu().getName())
+                        .isEqualTo(MenuName.중식);
+
+        Assertions.assertThat(room2.get().getRoomMenuList().get(1).getMenu().getName())
+                .isEqualTo(MenuName.중식);
     }
 
     @Test
@@ -205,6 +217,7 @@ public class TotalTest {
         room.setStatus(RoomStatus.active);
         room.setAnnouncement("sample");
         room.setMeetTime(LocalDateTime.now());
+        room.setAnnouncement("hellohellohello~~");
         return room;
     }
 }

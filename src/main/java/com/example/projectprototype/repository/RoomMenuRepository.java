@@ -5,10 +5,11 @@ import com.example.projectprototype.entity.Room;
 import com.example.projectprototype.entity.RoomMenu;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RoomMenuRepository extends CrudRepository <RoomMenu, Long> {
 
-    Optional<RoomMenu> findByRoom(Room room);
-    Optional<RoomMenu> findByMenu(Menu menu);
+    Optional<List<RoomMenu>> findByRoom(Room room);
+    Optional<List<RoomMenu>> findByMenu(Menu menu);
 }

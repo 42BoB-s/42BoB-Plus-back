@@ -57,7 +57,7 @@ public class Room extends TimeEntity {
         user.getOwnerList().add(this);
     }
 
-    public void addRoomUser(Participant participant) {
+    public void addParticipant(Participant participant) {
         this.participantList.add(participant);
         if (participant.getRoom() != this) {
             participant.setRoom(this);
