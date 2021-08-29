@@ -2,7 +2,10 @@ package com.example.projectprototype.entity;
 
 import com.example.projectprototype.entity.enums.Location;
 import com.example.projectprototype.entity.enums.RoomStatus;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -14,6 +17,7 @@ import java.util.List;
 @Table(name = "room")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Room extends TimeEntity {
 
     @Id
@@ -31,8 +35,9 @@ public class Room extends TimeEntity {
     
     private int capacity;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "owner")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     private User owner;
 
     private RoomStatus status;

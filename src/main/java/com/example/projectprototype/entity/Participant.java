@@ -1,6 +1,9 @@
 package com.example.projectprototype.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -8,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "participant")
 @Getter @Setter
+@NoArgsConstructor
 public class Participant extends TimeEntity {
     
     @Id
@@ -16,9 +20,11 @@ public class Participant extends TimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     private Room room;
 
     @ManyToOne
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     @JoinColumn(name = "user_id")
     private User user;
 

@@ -1,6 +1,9 @@
 package com.example.projectprototype.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -8,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "room_menu")
 @Getter @Setter
+@NoArgsConstructor
 public class RoomMenu extends TimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +19,12 @@ public class RoomMenu extends TimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     private Room room;
 
     @ManyToOne
     @JoinColumn(name = "menu_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     private Menu menu;
 
     public void setRoom(Room room) {

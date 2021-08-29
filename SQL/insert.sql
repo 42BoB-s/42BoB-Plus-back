@@ -8,3 +8,4 @@ insert into menu (name) values ('빵');
 insert into menu (name) values ('커피');
 insert into menu (name) values ('술');
 insert into menu (name) values ('편의점');
+

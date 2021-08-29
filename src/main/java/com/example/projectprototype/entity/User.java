@@ -1,6 +1,7 @@
 package com.example.projectprototype.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 @Getter @Setter
+@NoArgsConstructor
 public class User extends TimeEntity {
     @Id
     @Column(length = 45)

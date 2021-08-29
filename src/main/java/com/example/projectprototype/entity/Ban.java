@@ -1,6 +1,9 @@
 package com.example.projectprototype.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -8,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "ban")
 @Getter @Setter
+@NoArgsConstructor
 public class Ban extends TimeEntity {
 
     @Id
@@ -15,9 +19,11 @@ public class Ban extends TimeEntity {
     private Long id;
 
     @ManyToOne
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     private User src;
 
     @ManyToOne
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     private User dest;
 
     public void setSrc(User srcUser) {

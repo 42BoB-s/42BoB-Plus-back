@@ -11,4 +11,6 @@ public interface ParticipantRepository extends CrudRepository<Participant, Long>
 
     List<Participant> findByRoom(Room room);
     List<Participant> findByUser(User user);
+
+    Participant findParticipantByRoomEqualsAndUserEquals(Room room, User user);
 }
