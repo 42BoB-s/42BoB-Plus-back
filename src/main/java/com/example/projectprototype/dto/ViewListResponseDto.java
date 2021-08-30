@@ -3,6 +3,7 @@ package com.example.projectprototype.dto;
 import com.example.projectprototype.entity.User;
 import com.example.projectprototype.entity.enums.Location;
 import com.example.projectprototype.entity.enums.MenuName;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

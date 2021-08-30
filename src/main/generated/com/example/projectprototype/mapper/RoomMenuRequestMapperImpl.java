@@ -1,57 +1,58 @@
 package com.example.projectprototype.mapper;
 
 import com.example.projectprototype.dto.RoomMenuRequestDto;
+import com.example.projectprototype.dto.RoomMenuRequestDto.RoomMenuRequestDtoBuilder;
 import com.example.projectprototype.entity.RoomMenu;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2021-08-29T11:58:10+0900",
+    date = "2021-08-30T20:48:41+0900",
     comments = "version: 1.4.1.Final, compiler: javac, environment: Java 11.0.4 (Oracle Corporation)"
 )
 @Component
 public class RoomMenuRequestMapperImpl implements RoomMenuRequestMapper {
 
     @Override
-    public RoomMenuRequestDto toDto(RoomMenu e) {
-        if ( e == null ) {
+    public RoomMenuRequestDto toDto(RoomMenu arg0) {
+        if ( arg0 == null ) {
             return null;
         }
 
-        RoomMenuRequestDto roomMenuRequestDto = new RoomMenuRequestDto();
+        RoomMenuRequestDtoBuilder roomMenuRequestDto = RoomMenuRequestDto.builder();
 
-        roomMenuRequestDto.setRoom( e.getRoom() );
-        roomMenuRequestDto.setMenu( e.getMenu() );
+        roomMenuRequestDto.room( arg0.getRoom() );
+        roomMenuRequestDto.menu( arg0.getMenu() );
 
-        return roomMenuRequestDto;
+        return roomMenuRequestDto.build();
     }
 
     @Override
-    public RoomMenu toEntity(RoomMenuRequestDto d) {
-        if ( d == null ) {
+    public RoomMenu toEntity(RoomMenuRequestDto arg0) {
+        if ( arg0 == null ) {
             return null;
         }
 
         RoomMenu roomMenu = new RoomMenu();
 
-        roomMenu.setRoom( d.getRoom() );
-        roomMenu.setMenu( d.getMenu() );
+        roomMenu.setRoom( arg0.getRoom() );
+        roomMenu.setMenu( arg0.getMenu() );
 
         return roomMenu;
     }
 
     @Override
-    public void updateFromDto(RoomMenuRequestDto dto, RoomMenu entity) {
-        if ( dto == null ) {
+    public void updateFromDto(RoomMenuRequestDto arg0, RoomMenu arg1) {
+        if ( arg0 == null ) {
             return;
         }
 
-        if ( dto.getRoom() != null ) {
-            entity.setRoom( dto.getRoom() );
+        if ( arg0.getRoom() != null ) {
+            arg1.setRoom( arg0.getRoom() );
         }
-        if ( dto.getMenu() != null ) {
-            entity.setMenu( dto.getMenu() );
+        if ( arg0.getMenu() != null ) {
+            arg1.setMenu( arg0.getMenu() );
         }
     }
 }

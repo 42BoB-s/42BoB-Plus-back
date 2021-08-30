@@ -17,16 +17,11 @@ import java.util.List;
 @NoArgsConstructor
 public class RoomCreateRequestDto {
 
-	//entity 및 dto를 구분해서 구현
-	//https://yoonho-devlog.tistory.com/69
-
 	private String title;
 	private String strMeetTime; // 파싱필요
 	private Location location;
 	private int capacity;
 	private List<MenuName> menuNameList;
-
-	//ADD
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 }
