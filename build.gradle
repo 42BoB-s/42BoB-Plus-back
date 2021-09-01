@@ -23,13 +23,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    //mapstruct : modelmapper 성능저하 이슈 있기때문에 mapstruct 채용
     implementation 'org.mapstruct:mapstruct:1.4.1.Final'
     compileOnly 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.1.Final'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+
 }
 
 test {

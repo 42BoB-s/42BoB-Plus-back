@@ -40,6 +40,7 @@ public class Room extends TimeEntity {
     @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
     private User owner;
 
+    @Enumerated(EnumType.STRING)
     private RoomStatus status;
 
     @Lob

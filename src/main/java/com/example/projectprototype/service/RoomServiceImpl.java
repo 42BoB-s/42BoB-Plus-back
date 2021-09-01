@@ -102,7 +102,6 @@ public class RoomServiceImpl implements RoomService {
 		return ResponseDto.<Room>builder().interCode(0).build(); // 매칭되는 방이 없음
 	}
 
-	//User 객체는 Session 객체와 연동시킬 필요 있음
 	public ResponseDto<Room> roomCreate(User user, RoomCreateRequestDto dto)
 	{
 		ParticipantRequestDto participantRequestDto;

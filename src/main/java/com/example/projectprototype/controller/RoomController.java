@@ -19,20 +19,18 @@ public class RoomController {
 
 	private final RoomService roomService;
 
-	//임시
+	// 임시
 	private final UserRepository userRepository;
 
-	//User는 Session으로 수정 필요
+	// User는 Session으로 수정 필요
+
 	@PostMapping("/room")
 	public ResponseDto<Room> roomCreate(User user, RoomCreateRequestDto dto) {
 		return roomService.roomFindMatch(user, dto);
 	}
 
-	//PATCH?? -> PUT이 맞지 않을까?
-	//@PatchMapping(value = "/room/{roomid}")
 	@PutMapping(value = "/room/{roomid}")
-	public ResponseDto<Room> roomEnter(User user, @PathVariable long roomid)
-	{
+	public ResponseDto<Room> roomEnter(User user, @PathVariable long roomid) {
 		return roomService.roomEnter(userRepository.findById("user1").get(), roomid);
 	}
 
@@ -41,11 +39,9 @@ public class RoomController {
 		return roomService.roomExit(userRepository.findById("user1").get(), roomid);
 	}
 
-	//PUT?? -> PATCH가 맞지 않을까?
-	//@PutMapping(value="/room/title/{roomid}")
 	@PatchMapping(value="/room/title/{roomid}")
 	public ResponseDto<Room> roomEditTitle(User user, @PathVariable long roomid, @RequestBody HashMap<String, String> map) {
-		//Content-Type이 application/json 일 경우...
+		//Request Content-Type : application/json
 		return roomService.roomEditTitle(userRepository.findById("user1").get(), roomid, map.get("title"));
 	}
 }

@@ -29,7 +29,7 @@ public interface RoomRepository extends CrudRepository<Room, Long> {
                 "AND cnt < 4 " + //일단 capacity 최대 값은 4로 고정함
                 ") p " +
             "ON r.id = p.room_id " +
-            "WHERE p.cnt IS NOT NULL AND location = ?2 AND status = 0  " +
+            "WHERE p.cnt IS NOT NULL AND location = ?2 AND status = 'active' " +
                 "AND meet_time Between ?3 AND ?4 " +
                 "AND title LIKE ?5 " +
                 "AND r.id IN (SELECT DISTINCT room_id FROM room_menu r " +
@@ -42,6 +42,6 @@ public interface RoomRepository extends CrudRepository<Room, Long> {
 
     @Query(value = "SELECT r.* from room r " +
             "where id IN (SELECT room_id FROM participant WHERE user_id = ?1) " +
-            "AND status = 0", nativeQuery = true)
+            "AND status = 'active'", nativeQuery = true)
     List<Room> findMyRoom(String user_id);
 }

@@ -31,20 +31,19 @@ public class RoomTest {
 	@Test
 	@Rollback(false)
 	public void roomCreate() {
-		Optional<User> user = userRepository.findById("user1");
+		Optional<User> user = userRepository.findById("user2");
 		RoomCreateRequestDto dto = new RoomCreateRequestDto();
 		dto.setTitle("roomCreate");
-		dto.setStrMeetTime("2021-06-21 09:50:13");
+		dto.setStrMeetTime("2021-06-21 13:51:13");
 		dto.setCapacity(4);
 		dto.setLocation(Location.서초);
 		List<MenuName> menuNameList = new ArrayList<>();
-		menuNameList.add(MenuName.도시락);
+		//menuNameList.add(MenuName.도시락);
 		menuNameList.add(MenuName.배달음식);
-		menuNameList.add(MenuName.중식);
+		//menuNameList.add(MenuName.중식);
 		menuNameList.add(MenuName.술);
 		dto.setMenuNameList(menuNameList);
 		roomService.roomCreate(user.get(), dto);
-		// https://huisam.tistory.com/entry/mapStruct
 	}
 
 	@Test
@@ -52,8 +51,8 @@ public class RoomTest {
 	public void roomExit()
 	{
 		roomService.roomExit(
-				userRepository.findById("user4").get()
-				, 63
+				userRepository.findById("user1").get()
+				, 75
 		);
 	}
 
@@ -62,8 +61,8 @@ public class RoomTest {
 	public void roomEditTitle()
 	{
 		roomService.roomEditTitle(
-				userRepository.findById("user4").get()
-				, 64
+				userRepository.findById("user3").get()
+				, 74
 				, "아 만사가 귀찮아~"
 		);
 	}
@@ -74,7 +73,7 @@ public class RoomTest {
 	{
 		roomService.roomEnter(
 				userRepository.findById("user1").get()
-				, 65
+				, 78
 		);
 	}
 	

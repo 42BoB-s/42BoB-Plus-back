@@ -28,6 +28,8 @@ public class ViewController {
 	//임시
 	private final UserRepository userRepository;
 
+	// User는 Session으로 수정 필요
+
 	@GetMapping("/myroom")
 	public ResponseDto<List<ViewListResponseDto>> myRoomList(User user)
 	{
@@ -38,12 +40,9 @@ public class ViewController {
 	@GetMapping("/rooms")
 	public ResponseDto<List<ViewListResponseDto>>  defaultList(User user, ViewListRequestDto dto,
 	                                                           @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-		// Usage : http://localhost:8080/bobs/rooms?page=0&size=5&sort=id,desc + 방 데이터
-
-		////임시////
-		Optional<User> test = userRepository.findById("user4");
+		// Usage : http://localhost:8080/bobs/rooms?page=0&size=5&sort=id,desc + 방 데이터(필터)
+		Optional<User> test = userRepository.findById("user1");
 		dto.setLocation(Location.서초); // Session에서 가져오기
-
 		return viewService.scrollView(test.get(), dto, pageable);
 	}
 }

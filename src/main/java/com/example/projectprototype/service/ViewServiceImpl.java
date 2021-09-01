@@ -35,7 +35,7 @@ public class ViewServiceImpl implements ViewService {
 			dto.setMenu(menuList);
 		}
 		if (dto.getStrStartTime() == null || dto.getStrEndTime() == null) {
-			LocalDateTime startTime = LocalDateTime.parse("2021-06-20 10:49:13", formatter); // 테스트용
+			LocalDateTime startTime = LocalDateTime.parse("2021-06-21 10:49:13", formatter); // 테스트용
 			//LocalDateTime startTime = LocalDateTime.now();
 			dto.setStartTime(LocalDateTime.of(
 					startTime.getYear(),
