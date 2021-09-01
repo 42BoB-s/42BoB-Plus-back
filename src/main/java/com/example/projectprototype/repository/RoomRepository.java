@@ -26,14 +26,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query(value =
             "SELECT DISTINCT r.id as 'distinct_id' , r.* " +
             "FROM " +
-                "(SELECT * FROM room  WHERE location LIKE ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = '0') r " +
+                "(SELECT * FROM room  WHERE location LIKE ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = 'active') r " +
             "JOIN room_menu rm ON rm.room_id = r.id " +
             "JOIN menu m ON m.id = rm.menu_id " +
             "WHERE m.name IN ?4 AND r.title LIKE ?5 " +
             "ORDER BY r.id ",
             countQuery =
                     "SELECT COUNT(DISTINCT r.id) " +
-                            "FROM (SELECT * FROM room  WHERE location = ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = '0') r " +
+                            "FROM (SELECT * FROM room  WHERE location = ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = 'active') r " +
                             "JOIN room_menu rm ON rm.room_id = r.id " +
                             "JOIN menu m ON m.id = rm.menu_id " +
                             "WHERE m.name IN ?4 AND r.title LIKE ?5 " +
@@ -45,14 +45,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query(value =
             "SELECT DISTINCT r.id as 'distinct_id' , r.* " +
                     "FROM " +
-                    "(SELECT * FROM room  WHERE location LIKE ?1 AND status = '0') r " +
+                    "(SELECT * FROM room  WHERE location LIKE ?1 AND status = 'active') r " +
                     "JOIN room_menu rm ON rm.room_id = r.id " +
                     "JOIN menu m ON m.id = rm.menu_id " +
                     "WHERE m.name IN ?2 AND r.title LIKE ?3 " +
                     "ORDER BY r.id ",
             countQuery =
                     "SELECT COUNT(DISTINCT r.id) " +
-                            "FROM (SELECT * FROM room  WHERE location = ?1 AND status = '0') r " +
+                            "FROM (SELECT * FROM room  WHERE location = ?1 AND status = 'active') r " +
                             "JOIN room_menu rm ON rm.room_id = r.id " +
                             "JOIN menu m ON m.id = rm.menu_id " +
                             "WHERE m.name IN ?2 AND r.title LIKE ?3 " +

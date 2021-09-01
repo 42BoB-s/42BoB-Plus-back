@@ -170,6 +170,7 @@ public class RoomService {
 
         room.setMeetTime(LocalDateTime.parse(roomDTO.getMeetTime(), formatter));
         room.setStatus(RoomStatus.valueOf(roomDTO.getStatus()));
+        room.setOwner(userRepository.findById(userId).get());
         roomRepository.save(room);
         // Room 과 Menu 를 매핑하는 RoomMenu 객체를 만들어서 roomMenuList 에 저장
         for (String menuName : roomDTO.getMenus()) {
