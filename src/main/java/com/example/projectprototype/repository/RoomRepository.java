@@ -26,39 +26,39 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query(value =
             "SELECT DISTINCT r.id as 'distinct_id' , r.* " +
             "FROM " +
-                "(SELECT * FROM room  WHERE location LIKE ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = 'active') r " +
+                "(SELECT * FROM room  WHERE location LIKE ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = 'active' AND title LIKE ?4 ) r " +
             "JOIN room_menu rm ON rm.room_id = r.id " +
             "JOIN menu m ON m.id = rm.menu_id " +
-            "WHERE m.name IN ?4 AND r.title LIKE ?5 " +
+            "WHERE m.name IN ?5 " +
             "ORDER BY r.id ",
             countQuery =
                     "SELECT COUNT(DISTINCT r.id) " +
-                            "FROM (SELECT * FROM room  WHERE location = ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = 'active') r " +
+                            "FROM (SELECT * FROM room  WHERE location = ?1 AND meet_time BETWEEN ?2 AND ?3 AND status = 'active' AND title LIKE ?4) r " +
                             "JOIN room_menu rm ON rm.room_id = r.id " +
                             "JOIN menu m ON m.id = rm.menu_id " +
-                            "WHERE m.name IN ?4 AND r.title LIKE ?5 " +
+                            "WHERE m.name IN ?5 " +
                             "ORDER BY r.id ",
             nativeQuery = true)
-    Page<Room> SearchRoomsWithTime(String location, String startTime, String endTime,
-                               List<String> menuNameList, String keyword, Pageable pageable);
+    Page<Room> SearchRoomsWithTime(String location, String startTime, String endTime, String keyword,
+                               List<String> menuNameList, Pageable pageable);
 
     @Query(value =
             "SELECT DISTINCT r.id as 'distinct_id' , r.* " +
                     "FROM " +
-                    "(SELECT * FROM room  WHERE location LIKE ?1 AND status = 'active') r " +
+                    "(SELECT * FROM room  WHERE location = ?1 AND status = 'active' AND title LIKE ?2) r " +
                     "JOIN room_menu rm ON rm.room_id = r.id " +
                     "JOIN menu m ON m.id = rm.menu_id " +
-                    "WHERE m.name IN ?2 AND r.title LIKE ?3 " +
+                    "WHERE m.name IN ?3 " +
                     "ORDER BY r.id ",
             countQuery =
                     "SELECT COUNT(DISTINCT r.id) " +
-                            "FROM (SELECT * FROM room  WHERE location = ?1 AND status = 'active') r " +
+                            "FROM (SELECT * FROM room  WHERE location = ?1 AND status = 'active' AND title LIKE ?2) r " +
                             "JOIN room_menu rm ON rm.room_id = r.id " +
                             "JOIN menu m ON m.id = rm.menu_id " +
-                            "WHERE m.name IN ?2 AND r.title LIKE ?3 " +
+                            "WHERE m.name IN ?3 " +
                             "ORDER BY r.id ",
             nativeQuery = true)
-    Page<Room> SearchRoomsWithoutTime(String location,
-                                   List<String> menuNameList, String keyword, Pageable pageable);
+    Page<Room> SearchRoomsWithoutTime(String location, String keyword,
+                                   List<String> menuNameList, Pageable pageable);
 
 }

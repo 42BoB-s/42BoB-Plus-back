@@ -63,6 +63,7 @@ public class RoomController {
         return roomService.searchMyRooms(sessionDTO.getUserId());
     }
 
+    // 필터링된 방 조회
     @GetMapping("/bobs/rooms")
     public ListDto<RoomDto> searchRooms(HttpServletRequest req, HttpServletResponse resp,
                   Pageable pageable,

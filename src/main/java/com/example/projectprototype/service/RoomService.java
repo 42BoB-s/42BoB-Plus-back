@@ -116,6 +116,9 @@ public class RoomService {
                                      String keyword, Pageable pageable) {
         List<RoomDto> roomDtoList = new ArrayList<>();
         if (keyword.equals("default")) keyword = "%";
+        else {
+            keyword = "%" + keyword + "%";
+        }
         if (location.equals("default")) location = "%";
 
         List<String> menuNameList = new ArrayList<>();
@@ -148,10 +151,10 @@ public class RoomService {
                                    List<String> menuNameList, Pageable pageable) {
         Page<Room> roomPage;
         if (startTime.equals("default") || endTime.equals("default")) {
-            roomPage = roomRepository.SearchRoomsWithoutTime(location, menuNameList, keyword, pageable);
+            roomPage = roomRepository.SearchRoomsWithoutTime(location, keyword, menuNameList, pageable);
         } else {
           roomPage = roomRepository.SearchRoomsWithTime(location, startTime, endTime,
-                  menuNameList, keyword, pageable);
+                  keyword, menuNameList, pageable);
         }
         return roomPage;
     }
