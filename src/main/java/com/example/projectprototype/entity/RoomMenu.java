@@ -1,13 +1,15 @@
 package com.example.projectprototype.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
+@Getter @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "room_menu")
-@Getter @Setter
 public class RoomMenu extends TimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

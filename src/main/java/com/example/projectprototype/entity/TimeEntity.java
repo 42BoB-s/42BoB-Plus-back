@@ -1,6 +1,7 @@
 package com.example.projectprototype.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,8 +14,11 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
 @MappedSuperclass
-@Getter @Setter
 public class TimeEntity {
 
     @CreatedDate

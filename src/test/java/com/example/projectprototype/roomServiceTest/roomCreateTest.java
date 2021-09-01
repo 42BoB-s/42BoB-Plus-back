@@ -1,17 +1,19 @@
 package com.example.projectprototype.roomServiceTest;
 
-import com.example.projectprototype.dto.RoomDTO;
+import com.example.projectprototype.dto.RoomDto;
 import com.example.projectprototype.entity.Room;
 import com.example.projectprototype.entity.RoomMenu;
 import com.example.projectprototype.entity.User;
 import com.example.projectprototype.entity.enums.Location;
-import com.example.projectprototype.entity.enums.MenuName;
 import com.example.projectprototype.entity.enums.RoomStatus;
 import com.example.projectprototype.repository.RoomRepository;
 import com.example.projectprototype.repository.UserRepository;
 import com.example.projectprototype.service.RoomService;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,12 +23,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
- * roomConvert 장상 케이스 테스트
- * roomConvert 오류 케이스 테스트
+ * roomCreat 장상 / 오류 케이스 테스트
  */
 @SpringBootTest
 @Transactional
@@ -41,6 +40,10 @@ public class roomCreateTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+
     @Test
     void convertToRoomNormalTest() {
         String meetTime = "2021-08-28 11:30:00";
@@ -52,27 +55,27 @@ public class roomCreateTest {
         menuExpected.add("한식");
         menuExpected.add("커피");
 
-        RoomDTO roomDTO = RoomDTO.builder()
-                .owner(user)
-                .capacity(4)
-                .status("active")
-                .title("hello_room")
-                .location("서초")
-                .meetTime(meetTime)
-                .menus(menuExpected)
-                .build();
+        RoomDto roomDTO = new RoomDto();
+        roomDTO.setOwner(user);
+        roomDTO.setCapacity(4);
+        roomDTO.setStatus("active");
+        roomDTO.setTitle("hello_room");
+        roomDTO.setLocation("서초");
+        roomDTO.setMeetTime(meetTime);
+        roomDTO.setAnnouncement("announcement");
+        roomDTO.setMenus(menuExpected);
 
         // roomDTO 를 Room 으로 바꿔서 DB 에 저장.
-        long result = roomService.convertToRoom(roomDTO, user.getId());
-        Assertions.assertThat(result).isGreaterThan(0);
+        Room  room = roomService.convertToRoom(roomDTO, user.getId());
+        Assertions.assertThat(room.getId()).isGreaterThan(0);
 
         // DB에 저장된 정보를 Room 객체로 만들어서 정보 확인
-        Room room = roomRepository.findById(result).get();
-        Assertions.assertThat(room.getMeetTime().format(formatter))
+        Room room2 = roomRepository.findById(room.getId()).get();
+        Assertions.assertThat(room2.getMeetTime().format(formatter))
                 .isEqualTo(roomDTO.getMeetTime());
 
         List<String> menuActual = new ArrayList<>();
-        for (RoomMenu roomMenu : room.getRoomMenuList()) {
+        for (RoomMenu roomMenu : room2.getRoomMenuList()) {
             menuActual.add(roomMenu.getMenu().getName().toString());
         }
         Assertions.assertThat(menuActual).isEqualTo(menuActual);
@@ -93,15 +96,14 @@ public class roomCreateTest {
         List<String> menuExpected = new ArrayList<>();
         menuExpected.add("중식");
 
-        RoomDTO roomDTO = RoomDTO.builder()
-                .owner(user)
-                .capacity(4)
-                .status("active")
-                .title("hello_room")
-                .location("서초")
-                .meetTime(meetTime)
-                .menus(menuExpected)
-                .build();
+        RoomDto roomDTO = new RoomDto();
+        roomDTO.setOwner(user);
+        roomDTO.setCapacity(4);
+        roomDTO.setStatus("active");
+        roomDTO.setTitle("hello_room");
+        roomDTO.setLocation("서초");
+        roomDTO.setMeetTime(meetTime);
+        roomDTO.setMenus(menuExpected);
 
         boolean exceptionCatch = false;
         try {
@@ -121,15 +123,15 @@ public class roomCreateTest {
         List<String> menuExpected = new ArrayList<>();
         menuExpected.add("중식");
 
-        RoomDTO roomDTO = RoomDTO.builder()
-                .owner(user)
-                .capacity(4)
-                .status("active")
-                .title("hello_room")
-                .location("서초")
-                .meetTime(meetTime)
-                .menus(menuExpected)
-                .build();
+        RoomDto roomDTO = new RoomDto();
+        roomDTO.setOwner(user);
+        roomDTO.setCapacity(4);
+        roomDTO.setStatus("active");
+        roomDTO.setTitle("hello_room");
+        roomDTO.setLocation("서초");
+        roomDTO.setMeetTime(meetTime);
+        roomDTO.setAnnouncement("announcement");
+        roomDTO.setMenus(menuExpected);
 
         long result = roomService.createRoom(roomDTO, user.getId());
         Assertions.assertThat(result).isGreaterThan(0);
@@ -148,15 +150,15 @@ public class roomCreateTest {
         List<String> menuExpected = new ArrayList<>();
         menuExpected.add("중식");
 
-        RoomDTO roomDTO = RoomDTO.builder()
-                .owner(user)
-                .capacity(4)
-                .status("active")
-                .title("hello_room")
-                .location("서초")
-                .meetTime(meetTime)
-                .menus(menuExpected)
-                .build();
+        RoomDto roomDTO = new RoomDto();
+        roomDTO.setOwner(user);
+        roomDTO.setCapacity(4);
+        roomDTO.setStatus("active");
+        roomDTO.setTitle("hello_room");
+        roomDTO.setLocation("서초");
+        roomDTO.setMeetTime(meetTime);
+        roomDTO.setMenus(menuExpected);
+
         long result = roomService.createRoom(roomDTO, "hello");
         Assertions.assertThat(result).isEqualTo(-3L);
     }
@@ -171,32 +173,38 @@ public class roomCreateTest {
         List<String> menuExpected = new ArrayList<>();
         menuExpected.add("돈까스");
 
-        RoomDTO roomDTO = RoomDTO.builder()
-                .owner(user)
-                .capacity(4)
-                .status("active")
-                .title("hello_room")
-                .location("서초")
-                .meetTime(meetTime)
-                .menus(menuExpected)
-                .build();
-        long result = roomService.createRoom(roomDTO, "tjeong");
-        Assertions.assertThat(result).isEqualTo(-4L);
+        RoomDto roomDTO = new RoomDto();
+        roomDTO.setOwner(user);
+        roomDTO.setCapacity(4);
+        roomDTO.setStatus("active");
+        roomDTO.setTitle("hello_room");
+        roomDTO.setLocation("서초");
+        roomDTO.setMeetTime(meetTime);
+        roomDTO.setMenus(menuExpected);
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> { roomService.createRoom(roomDTO, "tjeong");
+        });
+
 
         // 지역
-        menuExpected.remove(0);
         menuExpected.add("중식");
-        RoomDTO roomDTO2 = RoomDTO.builder()
-                .owner(user)
-                .capacity(4)
-                .status("active")
-                .title("hello_room")
-                .location("강남")
-                .meetTime(meetTime)
-                .menus(menuExpected)
-                .build();
-        result = roomService.createRoom(roomDTO2, "tjeong");
-        Assertions.assertThat(result).isEqualTo(-4L);
+        menuExpected.remove(0);
+
+        RoomDto roomDTO2 = new RoomDto();
+        roomDTO.setOwner(user);
+        roomDTO.setCapacity(4);
+        roomDTO.setStatus("active");
+        roomDTO.setTitle("hello_room");
+        roomDTO.setLocation("강남");
+        roomDTO.setMeetTime(meetTime);
+        roomDTO.setMenus(menuExpected);
+
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> { roomService.createRoom(roomDTO2, "tjeong");
+                });
+
     }
 
     static User createTestUser(String userId, String profile, String role) {

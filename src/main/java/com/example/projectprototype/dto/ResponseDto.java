@@ -1,14 +1,15 @@
 package com.example.projectprototype.dto;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
-public class ListDTO <T>{
+@NoArgsConstructor
+public class ResponseDto {
+
     private int code;
     private int interCode;
-    private List<T> component;
 }

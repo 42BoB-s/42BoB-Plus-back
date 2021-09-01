@@ -1,15 +1,13 @@
 package com.example.projectprototype.controller;
 
-import com.example.projectprototype.dto.SessionDTO;
+import com.example.projectprototype.dto.SessionDto;
 import com.example.projectprototype.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -28,7 +26,7 @@ public class LoginController {
     public void OAuth(HttpServletRequest req, HttpServletResponse resp,
                       @RequestParam(value = "code") String code) {
         String token = loginService.getOAuthToken(code);
-        SessionDTO sessionDto = loginService.getUserInfo(token);
+        SessionDto sessionDto = loginService.getUserInfo(token);
         //임시
         HttpSession httpSession = loginService.getSession(req, sessionDto);
         try {

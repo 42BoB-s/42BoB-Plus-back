@@ -1,12 +1,13 @@
 package com.example.projectprototype.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Getter
 @Setter
-public class SessionDTO {
+@NoArgsConstructor
+public class SessionDto {
     String userId;
     String email;
     String profile;

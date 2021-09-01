@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SingleDTO<T>{
+public class SingleDto<T>{
 
     private int code;
     private int interCode;

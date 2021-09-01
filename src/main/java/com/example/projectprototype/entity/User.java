@@ -1,15 +1,18 @@
 package com.example.projectprototype.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "user")
-@Getter @Setter
 public class User extends TimeEntity {
     @Id
     @Column(length = 45)

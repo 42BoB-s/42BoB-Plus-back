@@ -1,6 +1,6 @@
 package com.example.projectprototype.service;
 
-import com.example.projectprototype.dto.SessionDTO;
+import com.example.projectprototype.dto.SessionDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -55,7 +55,7 @@ public class LoginService {
         return access_token;
     }
 
-    public SessionDTO getUserInfo(String token) {
+    public SessionDto getUserInfo(String token) {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -65,7 +65,7 @@ public class LoginService {
         ResponseEntity<String> response = null;
         String getInfoUrl = "https://api.intra.42.fr/v2/me";
         response = restTemplate.exchange(getInfoUrl, HttpMethod.GET, request, String.class);
-        SessionDTO sessionDto = new SessionDTO();
+        SessionDto sessionDto = new SessionDto();
         JSONParser parser = new JSONParser();
         try{
             Object obj = parser.parse(response.getBody());
@@ -78,11 +78,11 @@ public class LoginService {
         return sessionDto;
     }
 
-    public HttpSession getSession(HttpServletRequest req, SessionDTO sessionDto) {
+    public HttpSession getSession(HttpServletRequest req, SessionDto sessionDto) {
 
         HttpSession session = req.getSession();
 
-        if ((SessionDTO)session.getAttribute("session") == null)
+        if ((SessionDto)session.getAttribute("session") == null)
             session.setAttribute("session", sessionDto);
         return session;
     }

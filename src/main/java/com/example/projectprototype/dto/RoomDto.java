@@ -1,25 +1,27 @@
 package com.example.projectprototype.dto;
 
 import com.example.projectprototype.entity.User;
-import com.example.projectprototype.entity.enums.Location;
-import com.example.projectprototype.entity.enums.RoomStatus;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@Builder
-public class RoomDTO {
-    private long roomId;
+@NoArgsConstructor
+public class RoomDto {
+
+    private long Id;
     private String title;
-    private List<String> menus;
     private String meetTime;
     private String location;
+    private UserDto owner;
     private int capacity;
-    private User owner;
-    private List<User> participants;
     private String status;
+    private String announcement;
+
+    private List<String> menus = new ArrayList<>();
+    private List<UserDto> participants = new ArrayList<>();
 }

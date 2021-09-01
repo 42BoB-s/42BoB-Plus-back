@@ -2,15 +2,17 @@ package com.example.projectprototype.entity;
 
 import com.example.projectprototype.entity.enums.MenuName;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "menu")
-@Getter @Setter
 public class Menu extends TimeEntity {
 
     @Id
