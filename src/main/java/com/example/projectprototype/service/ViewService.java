@@ -8,7 +8,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface ScrollService {
-	void scrollInit(ViewListRequestDto dto);
+public interface ViewService {
+	void viewInit(ViewListRequestDto dto);
 	ResponseDto<List<ViewListResponseDto>> scrollView(User user, ViewListRequestDto dto, Pageable pageable);
+	ResponseDto<List<ViewListResponseDto>> myRoomView(User user);
 }

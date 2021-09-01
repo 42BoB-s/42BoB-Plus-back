@@ -26,7 +26,7 @@ public interface RoomRepository extends CrudRepository<Room, Long> {
                 "SELECT room_id, COUNT(*) cnt FROM participant  " +
                 "GROUP BY room_id  " +
                 "HAVING room_id NOT IN (SELECT room_id FROM participant WHERE user_id = ?1) " +
-                "AND cnt < 4 " +
+                "AND cnt < 4 " + //일단 capacity 최대 값은 4로 고정함
                 ") p " +
             "ON r.id = p.room_id " +
             "WHERE p.cnt IS NOT NULL AND location = ?2 AND status = 0  " +
@@ -39,4 +39,9 @@ public interface RoomRepository extends CrudRepository<Room, Long> {
                 ") " +
             "order by r.id", nativeQuery = true)
     List<Room> findDefaultView(String user_id, String location, LocalDateTime startTime, LocalDateTime endTime, String keword, List<String> menuList, Pageable pageable);
+
+    @Query(value = "SELECT r.* from room r " +
+            "where id IN (SELECT room_id FROM participant WHERE user_id = ?1) " +
+            "AND status = 0", nativeQuery = true)
+    List<Room> findMyRoom(String user_id);
 }

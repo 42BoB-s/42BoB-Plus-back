@@ -18,12 +18,12 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ScrollServiceImpl implements ScrollService {
+public class ViewServiceImpl implements ViewService {
 	private final RoomRepository roomRepository;
 	private final MenuRepository menuRepository;
 	private final ViewListResponseMapper viewListResponseMapper = Mappers.getMapper(ViewListResponseMapper.class);
 
-	public void scrollInit(ViewListRequestDto dto) {
+	public void viewInit(ViewListRequestDto dto) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		//if (dto.getLocation() == null)
 		//	dto.setLocation("세션"); 파라미터에 없는 경우 Session에서 가져오기
@@ -68,7 +68,7 @@ public class ScrollServiceImpl implements ScrollService {
 
 	public ResponseDto<List<ViewListResponseDto>> scrollView(User user, ViewListRequestDto dto, Pageable pageable)
 	{
-		scrollInit(dto);
+		viewInit(dto);
 		List<ViewListResponseDto> viewListResponseDtoList = new ArrayList<>();
 		List<Room> list = roomRepository.findDefaultView(
 				user.getId(),
@@ -88,6 +88,16 @@ public class ScrollServiceImpl implements ScrollService {
 				.component(viewListResponseDtoList).build();
 	}
 
-
-
+	@Override
+	public ResponseDto<List<ViewListResponseDto>> myRoomView(User user) {
+		List<ViewListResponseDto> viewListResponseDtoList = new ArrayList<>();
+		List<Room> list = roomRepository.findMyRoom(user.getId());
+		for (Room r : list) {
+			ViewListResponseDto viewListResponseDto = viewListResponseMapper.toDto(r);
+			viewListResponseDtoList.add(viewListResponseDto);
+		}
+		return ResponseDto.<List<ViewListResponseDto>>builder()
+				.interCode(1)
+				.component(viewListResponseDtoList).build();
+	}
 }

@@ -7,6 +7,7 @@ import com.example.projectprototype.entity.enums.MenuName;
 import com.example.projectprototype.repository.*;
 import com.example.projectprototype.service.RoomService;
 import com.example.projectprototype.service.RoomServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +34,7 @@ public class RoomTest {
 		Optional<User> user = userRepository.findById("user1");
 		RoomCreateRequestDto dto = new RoomCreateRequestDto();
 		dto.setTitle("roomCreate");
-		dto.setStrMeetTime("2021-06-20 23:50:13");
+		dto.setStrMeetTime("2021-06-21 09:50:13");
 		dto.setCapacity(4);
 		dto.setLocation(Location.서초);
 		List<MenuName> menuNameList = new ArrayList<>();
@@ -80,8 +81,6 @@ public class RoomTest {
 	//진행해야 할 목록 (우선순위 순)
 	/*
 	- 밴 고려 안되어 있음 추가 필요
-	- 트랜잭셔널 어노테이션
-	- roomEnter unit 테스트로 만들기 (컨트롤러도 테스트 가능하도록)
 	- JPA : N+1 문제 생기는지 검토 필요
 	 */
 	//
