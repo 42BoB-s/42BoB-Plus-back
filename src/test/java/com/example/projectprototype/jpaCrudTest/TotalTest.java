@@ -6,7 +6,11 @@ import com.example.projectprototype.entity.enums.MenuName;
 import com.example.projectprototype.entity.enums.MessageType;
 import com.example.projectprototype.entity.enums.RoomStatus;
 import com.example.projectprototype.repository.*;
+import com.example.projectprototype.service.ParticipantService;
+import com.example.projectprototype.service.RoomService;
+import com.example.projectprototype.service.UserService;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +40,12 @@ public class TotalTest {
     @Autowired
     private ChatMessageRepository messageRepository;
 
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private RoomService roomService;
+    @Autowired
+    private ParticipantService participantService;
 
     @Test
     void UserCRUD() {
@@ -206,6 +216,44 @@ public class TotalTest {
         room.setAnnouncement("sample");
         room.setMeetTime(LocalDateTime.now());
         return room;
+    }
+/*-------------------------------------------------RoomControllerTest-----------------------------------------------------------------------*/
+    @Test
+    void checkValidTimetest()
+    {
+        List<LocalDateTime> timeList = new ArrayList<>();
+        LocalDateTime newRoomTime = LocalDateTime.of(2020, 12, 20, 9, 30, 30);
+
+        //LocalDateTime time1 = LocalDateTime.of(2020, 12, 21, 9, 30, 30); //true
+        LocalDateTime time2 = LocalDateTime.of(2020, 12, 20, 19, 30, 30); //true
+        //  LocalDateTime time3 = LocalDateTime.of(2020, 12, 20, 9, 45, 30); //false
+        //  LocalDateTime time4 = LocalDateTime.of(2020, 12, 20, 8, 30, 30); //true
+
+
+        User user1 = userService.createUser("user123","profileEx","normal");
+        List<MenuName> menus= new ArrayList<>();
+        menus.add(MenuName.분식);
+        menus.add(MenuName.중식);
+        Room room1 = roomService.createRoom("title(owner는 user1)",time2,Location.서초,5,user1,"default",menus);
+
+        Participant participant = participantService.enterRoom(user1, room1);
+
+        Assertions.assertThat(participantService.checkValidTime(user1.getParticipantList(),newRoomTime)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("나의 방 조회 테스트")
+    void getMyRoomList() throws Exception{
+        User user1 = userService.createUser("user1","peofileEx(user1)","normal");
+        User user2 = userService.createUser("user2","peofileEx(user2)","normal");
+        User user3 = userService.createUser("user3","peofileEx(user3)","normal");
+        List<MenuName> menus= new ArrayList<>();
+        menus.add(MenuName.분식);
+        menus.add(MenuName.중식);
+
+        Room room1 = roomService.createRoom("title(owner는 user1)",LocalDateTime.now(),Location.서초,5,user1,"default",menus);
+        Room room2 = roomService.createRoom("title(owner는 user2)",LocalDateTime.now(),Location.개포,3,user2,"default",menus);
+
     }
 }
 

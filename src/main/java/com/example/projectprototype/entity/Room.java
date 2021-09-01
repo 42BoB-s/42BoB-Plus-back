@@ -35,6 +35,7 @@ public class Room extends TimeEntity {
     @JoinColumn(name = "owner")
     private User owner;
 
+    @Enumerated(EnumType.STRING)
     private RoomStatus status;
 
     @Lob
