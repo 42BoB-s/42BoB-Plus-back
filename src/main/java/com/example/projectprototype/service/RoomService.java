@@ -38,16 +38,19 @@ public class RoomService {
     private final UserService userService;
     private final RoomMapper roomMapper;
 
+    /** 전달된 정보를 바탕으로
+     * -양수 생성된 방의 id
+     * -1 입력된 시간의 형태가 형식에 맞지 않음.
+     * -2 입력된 시간 + 1시간 이내에 유저가 방에 참여하고 있음.
+     * -3 userId 가 DB에 등록되지 않은 id 임.
+     * -4 enum 형 string 들 (ex : menus, location) 이 형식에 맞지 않음.
+     */
     public long createRoom(RoomDto roomDTO, String userId) {
         LocalDateTime inputTime = LocalDateTime.parse(roomDTO.getMeetTime(), formatter);
 
-        // 입력된 시간이 parsing 할 수 있는 형태인지
         if (!isParsableTime(roomDTO.getMeetTime())) return -1L;
-        // user 정보가 DB에 없으면 -3
         if (!userService.userIdCheck(userId)) return -3L;
-        // enum 에 해당 location 정보가 없으면 -4
         if (!isInLocation(roomDTO.getLocation())) return -4L;
-        // enum 에 해당 menuName 정보가 없으면 -4
         for (String menuName : roomDTO.getMenus()) {
             if (!isInMenuName(menuName)) return -4L;
         }
@@ -103,20 +106,12 @@ public class RoomService {
        return DTO;
     }
 
-    /** 전달된 정보를 바탕으로
-     * -양수 생성된 방의 id
-     * -1 입력된 시간의 형태가 형식에 맞지 않음.
-     * -2 입력된 시간 + 1시간 이내에 유저가 방에 참여하고 있음.
-     * -3 userId 가 DB에 등록되지 않은 id 임.
-     * -4 enum 형 string 들 (ex : menus, location) 이 형식에 맞지 않음.
-     */
-
     /**
      * location default 일때는 LIKE 로 커버
      * menu 도 default 일때는 모든 메뉴를 list 에 넣도록 커버
      * time 이 default 일때는 쿼리를 따로 만드렁서 커버
      */
-    public List<RoomDto> searchRooms(String location, String menu,
+    public List<RoomDto> searchRooms(String userId, String location, String menu,
                                      String startTime, String endTime,
                                      String keyword, Pageable pageable) {
         List<RoomDto> roomDtoList = new ArrayList<>();
@@ -126,11 +121,27 @@ public class RoomService {
         List<String> menuNameList = new ArrayList<>();
         getMenuName(menu, menuNameList);
         Page<Room> roomPage = getRoomPage(location, startTime, endTime, keyword, menuNameList, pageable);
-
-        for (Room room : roomPage.getContent()){
-            roomDtoList.add(convertToRoomDTO(room));
-        }
+        composeDto(userId, roomPage, roomDtoList);
         return roomDtoList;
+    }
+
+    private void composeDto(String userId, Page<Room> roomPage, List<RoomDto> roomDtoList) {
+        for (Room room : roomPage.getContent()){
+            if (!IsExcludedRoom(userId, room, roomDtoList)) {
+                roomDtoList.add(convertToRoomDTO(room));
+            }
+        }
+    }
+
+    private boolean IsExcludedRoom(String userId, Room room, List<RoomDto> roomDtoList) {
+        for (Participant part : room.getParticipantList()) {
+            for (Ban ban : part.getUser().getBanSrcList()) {
+                if (ban.getDest().getId().equals(userId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private Page<Room> getRoomPage(String location, String startTime, String endTime, String keyword,

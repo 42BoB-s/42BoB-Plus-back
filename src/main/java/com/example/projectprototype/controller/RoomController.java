@@ -72,14 +72,13 @@ public class RoomController {
                                @RequestParam String endTime,
                                @RequestParam String keyword) {
 
-        /*
         SessionDto sessionDTO = sessionCheck(req);
         if (sessionDTO == null)
             redirectLogin(resp);
 
         if (!userService.userIdCheck(sessionDTO.getUserId()))
             redirectLogin(resp);
-         */
+
         ListDto<RoomDto> responseDto = new ListDto<>();
         long check = roomService.paramsCheck(location, menu, startTime, endTime);
         if (check < 0L) {
@@ -88,7 +87,8 @@ public class RoomController {
             return responseDto;
         }
 
-        List<RoomDto> roomDtoList = roomService.searchRooms(location, menu, startTime, endTime, keyword, pageable);
+        List<RoomDto> roomDtoList = roomService.searchRooms(sessionDTO.getUserId(),
+                location, menu, startTime, endTime, keyword, pageable);
         responseDto.setComponent(roomDtoList);
         responseDto.setCode(200);
         responseDto.setInterCode(1);
