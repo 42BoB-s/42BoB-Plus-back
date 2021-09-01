@@ -11,5 +11,5 @@ import java.util.List;
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
     List<Participant> findByRoom(Room room);
-    List<Participant> findByUser(User user);
+    List<Participant> findByUserId(String userId);
 }

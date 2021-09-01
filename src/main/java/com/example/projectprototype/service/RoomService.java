@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -40,10 +41,11 @@ public class RoomService {
 
     /** 전달된 정보를 바탕으로
      * -양수 생성된 방의 id
-     * -1 입력된 시간의 형태가 형식에 맞지 않음.
+     * -1 parse error (ex : 입력된 시간의 형태가 형식에 맞지 않음)
      * -2 입력된 시간 + 1시간 이내에 유저가 방에 참여하고 있음.
      * -3 userId 가 DB에 등록되지 않은 id 임.
      * -4 enum 형 string 들 (ex : menus, location) 이 형식에 맞지 않음.
+     * -5 roomId 가 DB에 등록되지 않은 id 임.
      */
     public long createRoom(RoomDto roomDTO, String userId) {
         LocalDateTime inputTime = LocalDateTime.parse(roomDTO.getMeetTime(), formatter);
@@ -56,11 +58,10 @@ public class RoomService {
         }
 
         // 기존에 만들어진 방이 없으면 방 생성해서 return
-        List<Participant> participants =
-                participantRepository.findByUser(userRepository.findById(userId).get());
+        List<Participant> participants = participantRepository.findByUserId(userId);
         if (participants.size() == 0) {
             Room room = convertToRoom(roomDTO, userId);
-            participateRoom(room, userId);
+            setParticipate(room, userId);
             return room.getId();
         }
 
@@ -75,7 +76,7 @@ public class RoomService {
         // 제약 조건을 모두 통과하면 roomDTO 를 Room 객체로 만들고 DB에 등록.
         Room room = convertToRoom(roomDTO, userId);
         // participate 테이블에도 mapping
-        participateRoom(room, userId);
+        setParticipate(room, userId);
         return room.getId();
     }
 
@@ -84,8 +85,7 @@ public class RoomService {
      */
     public ListDto<RoomDto> searchMyRooms(String userId) {
        // 참여한 방 정보 확인
-        List<Participant> participants =
-               participantRepository.findByUser(userRepository.findById(userId).get());
+        List<Participant> participants = participantRepository.findByUserId(userId);
        if (participants.size() ==0)
            return null;
 
@@ -112,9 +112,9 @@ public class RoomService {
      * time 이 default 일때는 쿼리를 따로 만드렁서 커버
      */
     public List<RoomDto> searchRooms(String userId, String location, String menu,
-                                     String startTime, String endTime,
-                                     String keyword, Pageable pageable) {
+                                     String startTime, String endTime, String keyword, Pageable pageable) {
         List<RoomDto> roomDtoList = new ArrayList<>();
+
         if (keyword.equals("default")) keyword = "%";
         else {
             keyword = "%" + keyword + "%";
@@ -126,6 +126,29 @@ public class RoomService {
         Page<Room> roomPage = getRoomPage(location, startTime, endTime, keyword, menuNameList, pageable);
         composeDto(userId, roomPage, roomDtoList);
         return roomDtoList;
+    }
+
+    public Long participateRoom(String userId, String roomId) {
+
+        // roomId parse 할 수 있는지
+        Long id = isParsableRoomId(roomId);
+        if (id < 0L) return -1L;
+        // roomId 로 DB 에서 room 이 조회되는지
+        Optional<Room> room = roomRepository.findById(isParsableRoomId(roomId));
+        if (room.isEmpty()) return -5L;
+        // 기존에 참여하던 방과 지금 참여하려는 방이 시간이 겹치지 않는지
+        List<Participant> participants = participantRepository.findByUserId(userId);
+        if (participants.size() != 0) {
+            for (Participant part : participants) {
+                Room loopRoom = roomRepository.findByIdAndStatus(part.getRoom().getId(), RoomStatus.active).get();
+                LocalDateTime priorTime = loopRoom.getMeetTime();
+                if (!isValidTime(priorTime, room.get().getMeetTime())) {
+                    return -2L;
+                }
+            }
+        }
+        setParticipate(room.get(),userId);
+        return id;
     }
 
     private void composeDto(String userId, Page<Room> roomPage, List<RoomDto> roomDtoList) {
@@ -172,12 +195,6 @@ public class RoomService {
         }
     }
 
-    /** RoomDTO 객체를 Room 으로 변환. (방 생성할 때만 사용함)
-     * -양수 생성된 방의 id
-     * -3 userId 가 DB에 등록되지 않은 id
-     * -4 RoomDTO 에서 넘어온 enum 형 string 들 (ex : menus, location) 이 형식에 맞지 않을 경우 오류
-     * how to check if an enum contains String (https://www.javacodestuffs.com/2020/07/how-to-check-if-enum-contains-string.html)
-     */
     public Room convertToRoom(RoomDto roomDTO, String userId) {
 
         Room room = roomMapper.toEntity(roomDTO);
@@ -215,12 +232,7 @@ public class RoomService {
         return roomDTO;
     }
 
-    /**
-     * room 에 userId 가 참여하도록 DB에 mapping 함
-     * -양수 : roomId
-     * -3 : userId 가 DB 에서 조회되지 않음.
-     */
-    public long participateRoom(Room room, String userId) {
+    public long setParticipate(Room room, String userId) {
         if (!userService.userIdCheck(userId)) return -3L;
 
         Participant participant = new Participant();
@@ -261,6 +273,15 @@ public class RoomService {
             return false;
         }
         return true;
+    }
+
+    public Long isParsableRoomId(String roomId) {
+        try {
+            return Long.parseLong(roomId);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return -1L;
+        }
     }
 
     // 주어진 String 이 Location enum 에 포함된 값인지 확인

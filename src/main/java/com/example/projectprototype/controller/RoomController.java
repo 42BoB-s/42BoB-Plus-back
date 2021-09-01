@@ -6,10 +6,7 @@ import com.example.projectprototype.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,8 +62,7 @@ public class RoomController {
 
     // 필터링된 방 조회
     @GetMapping("/bobs/rooms")
-    public ListDto<RoomDto> searchRooms(HttpServletRequest req, HttpServletResponse resp,
-                  Pageable pageable,
+    public ListDto<RoomDto> searchRooms(HttpServletRequest req, HttpServletResponse resp, Pageable pageable,
                                @RequestParam String location,
                                @RequestParam String menu,
                                @RequestParam String startTime,
@@ -93,6 +89,27 @@ public class RoomController {
         responseDto.setComponent(roomDtoList);
         responseDto.setCode(200);
         responseDto.setInterCode(1);
+        return responseDto;
+    }
+
+    @PatchMapping("/bobs/room/{roomid}")
+    public ResponseDto participateRoom(HttpServletRequest req, HttpServletResponse resp,
+                                       @PathVariable String roomid){
+        SessionDto sessionDTO = sessionCheck(req);
+        if (sessionDTO == null)
+            redirectLogin(resp);
+
+        if (!userService.userIdCheck(sessionDTO.getUserId()))
+            redirectLogin(resp);
+
+        long result = roomService.participateRoom(sessionDTO.getUserId(), roomid);
+        ResponseDto responseDto = new ResponseDto();
+        if (result < 0L) {
+            responseDto.setCode(500);
+        } else {
+            responseDto.setCode(200);
+        }
+        responseDto.setInterCode((int)result);
         return responseDto;
     }
 
