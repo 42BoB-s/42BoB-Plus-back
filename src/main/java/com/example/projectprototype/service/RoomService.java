@@ -25,6 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/** Long return 값
+ * 양수 생성된 방의 id
+ * -1 : parse error (ex : 입력된 시간의 형태가 형식에 맞지 않음)
+ * -2 : 입력된 시간 + 1시간 이내에 유저가 방에 참여하고 있음.
+ * -3 : userId 가 DB에 등록되지 않은 id 임.
+ * -4 : enum 형 string 들 (ex : menus, location) 이 형식에 맞지 않음.
+ * -5 : roomId 가 DB에 등록되지 않은 id 임.
+ * -6 : room 과 user 간에 관련성이 없음.
+ */
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -37,16 +47,11 @@ public class RoomService {
     private final ParticipantRepository participantRepository;
 
     private final UserService userService;
+    private final ParticipantService partService;
     private final RoomMapper roomMapper;
 
-    /** 전달된 정보를 바탕으로
-     * -양수 생성된 방의 id
-     * -1 parse error (ex : 입력된 시간의 형태가 형식에 맞지 않음)
-     * -2 입력된 시간 + 1시간 이내에 유저가 방에 참여하고 있음.
-     * -3 userId 가 DB에 등록되지 않은 id 임.
-     * -4 enum 형 string 들 (ex : menus, location) 이 형식에 맞지 않음.
-     * -5 roomId 가 DB에 등록되지 않은 id 임.
-     */
+    // 방생성 : 채팅방 생성은 설정 안되어 있음.
+    // 입력된 시간이 지금보다 전이면 fail 줘야함.
     public long createRoom(RoomDto roomDTO, String userId) {
         LocalDateTime inputTime = LocalDateTime.parse(roomDTO.getMeetTime(), formatter);
 
@@ -61,7 +66,7 @@ public class RoomService {
         List<Participant> participants = participantRepository.findByUserId(userId);
         if (participants.size() == 0) {
             Room room = convertToRoom(roomDTO, userId);
-            setParticipate(room, userId);
+            partService.setParticipate(room, userId);
             return room.getId();
         }
 
@@ -76,13 +81,14 @@ public class RoomService {
         // 제약 조건을 모두 통과하면 roomDTO 를 Room 객체로 만들고 DB에 등록.
         Room room = convertToRoom(roomDTO, userId);
         // participate 테이블에도 mapping
-        setParticipate(room, userId);
+        partService.setParticipate(room, userId);
         return room.getId();
     }
 
     /** 주어진 userId 가 참여중인 active 상태의 방을 DTO로 변환하여 반환
      * -null 참여중인 방이 없으면
      */
+    // 참여 정보 볼때 roomStatus 까지 고려해서 필터링 할 수 있도록
     public ListDto<RoomDto> searchMyRooms(String userId) {
        // 참여한 방 정보 확인
         List<Participant> participants = participantRepository.findByUserId(userId);
@@ -109,8 +115,9 @@ public class RoomService {
     /**
      * location default 일때는 LIKE 로 커버
      * menu 도 default 일때는 모든 메뉴를 list 에 넣도록 커버
-     * time 이 default 일때는 쿼리를 따로 만드렁서 커버
+     * time 이 default 일때는 쿼리를 따로 만들어서 커버
      */
+    // time default 면 시간을 길게 줘버리면 됨.
     public List<RoomDto> searchRooms(String userId, String location, String menu,
                                      String startTime, String endTime, String keyword, Pageable pageable) {
         List<RoomDto> roomDtoList = new ArrayList<>();
@@ -125,10 +132,12 @@ public class RoomService {
         getMenuName(menu, menuNameList);
         Page<Room> roomPage = getRoomPage(location, startTime, endTime, keyword, menuNameList, pageable);
         composeDto(userId, roomPage, roomDtoList);
+        // 자기가 참여한 방은 제외해야함.
+        // capacity 를 고려해야함.
         return roomDtoList;
     }
 
-    public Long participateRoom(String userId, String roomId) {
+    public Long enterRoom(String userId, String roomId) {
 
         // roomId parse 할 수 있는지
         Long id = isParsableRoomId(roomId);
@@ -147,8 +156,27 @@ public class RoomService {
                 }
             }
         }
-        setParticipate(room.get(),userId);
+        // 활성화된 방인지 체크
+        // 최대인원 체크
+        partService.setParticipate(room.get(), userId);
         return id;
+    }
+
+    public Long exitRoom(String userId, String roomId) {
+        // roomId parse 할 수 있는지
+        Long id = isParsableRoomId(roomId);
+        if (id < 0L) return -1L;
+        // roomId 로 DB 에서 room 이 조회되는지
+        Optional<Room> room = roomRepository.findById(isParsableRoomId(roomId));
+        if (room.isEmpty()) return -5L;
+        // 해당 room 에 userId 가 속해있는지
+        if (!partService.isParticipant(room.get(), userId)) return -6L;
+        // room participant 에서 제거
+
+        // 방장 넘기는 로직
+
+        // 만약 participant 가 0 이 되면 roomStatus 바꿔야함.
+        return 1L;
     }
 
     private void composeDto(String userId, Page<Room> roomPage, List<RoomDto> roomDtoList) {
@@ -159,6 +187,7 @@ public class RoomService {
         }
     }
 
+    // user 가 벤되어 있는 방인지 확인
     private boolean IsExcludedRoom(String userId, Room room, List<RoomDto> roomDtoList) {
         for (Participant part : room.getParticipantList()) {
             for (Ban ban : part.getUser().getBanSrcList()) {
@@ -195,6 +224,7 @@ public class RoomService {
         }
     }
 
+    // RoomDto 를 room 엔티티로 변환
     public Room convertToRoom(RoomDto roomDTO, String userId) {
 
         Room room = roomMapper.toEntity(roomDTO);
@@ -210,7 +240,6 @@ public class RoomService {
             roomMenu.setMenu(menuRepository.findByName(MenuName.valueOf(menuName)));
             roomMenuRepository.save(roomMenu);
         }
-
         return room;
     }
 
@@ -230,16 +259,6 @@ public class RoomService {
             roomDTO.getParticipants().add(userService.convertToUserDto(part.getUser()));
         }
         return roomDTO;
-    }
-
-    public long setParticipate(Room room, String userId) {
-        if (!userService.userIdCheck(userId)) return -3L;
-
-        Participant participant = new Participant();
-        participant.setRoom(room);
-        participant.setUser(userRepository.findById(userId).get());
-        participantRepository.save(participant);
-        return room.getId();
     }
 
     public int paramsCheck(String location, String menu, String startTime, String endTime) {

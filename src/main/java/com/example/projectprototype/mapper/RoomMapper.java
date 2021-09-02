@@ -31,9 +31,3 @@ public interface RoomMapper extends GenericMapper<RoomDto, Room> {
 
 }
 
-// 기존에 있던 room 정보를 roomDto 로 바꾸는 작업
-
-// roomDto 가 들어오면 이걸 room 으로 바꾸는 작업
-// Room 을 생성할 때
-// Room 을 업데이트 할 때
-

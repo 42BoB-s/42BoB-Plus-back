@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -25,7 +24,7 @@ public class RoomController {
     private final RoomService roomService;
 
     // 방 생성
-    @PostMapping("/room")
+    @PostMapping("/bobs/room")
     public ResponseDto createRoom(RoomDto roomDTO,
                                   HttpServletRequest req, HttpServletResponse resp) {
         SessionDto sessionDTO = sessionCheck(req);
@@ -44,7 +43,7 @@ public class RoomController {
     }
 
     // 예약한 방 조회
-    @GetMapping("/myroom")
+    @GetMapping("/bpbs/myroom")
     public ListDto<RoomDto> searchMyRoom(HttpServletRequest req, HttpServletResponse resp) {
 
         // session 값이 있는지 확인, 없으면 login 화면으로 보내기.
@@ -61,6 +60,8 @@ public class RoomController {
     }
 
     // 필터링된 방 조회
+    // menu 는 List로 받으면 List로 받아짐.
+    // response 받는걸 dto 로 통일하기.
     @GetMapping("/bobs/rooms")
     public ListDto<RoomDto> searchRooms(HttpServletRequest req, HttpServletResponse resp, Pageable pageable,
                                @RequestParam String location,
@@ -102,7 +103,7 @@ public class RoomController {
         if (!userService.userIdCheck(sessionDTO.getUserId()))
             redirectLogin(resp);
 
-        long result = roomService.participateRoom(sessionDTO.getUserId(), roomid);
+        long result = roomService.enterRoom(sessionDTO.getUserId(), roomid);
         ResponseDto responseDto = new ResponseDto();
         if (result < 0L) {
             responseDto.setCode(500);
@@ -111,6 +112,18 @@ public class RoomController {
         }
         responseDto.setInterCode((int)result);
         return responseDto;
+    }
+
+    @DeleteMapping("/bobs/room/{roomid}")
+    public ResponseDto exitRoom(HttpServletRequest req, HttpServletResponse resp,
+                                @PathVariable String roomid) {
+        SessionDto sessionDTO = sessionCheck(req);
+        if (sessionDTO == null)
+            redirectLogin(resp);
+
+        if (!userService.userIdCheck(sessionDTO.getUserId()))
+            redirectLogin(resp);
+        return new ResponseDto();
     }
 
     private void redirectLogin(HttpServletResponse resp) {
