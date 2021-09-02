@@ -1,0 +1,7 @@
+Long return 값
+ -1 : parse error (ex : 입력된 시간의 형태가 형식에 맞지 않음)
+ -2 : 입력된 시간 + 1시간 이내에 유저가 방에 참여하고 있음.
+ -3 : userId 가 DB에 등록되지 않은 id 임.
+ -4 : enum 형 string 들 (ex : menus, location) 이 형식에 맞지 않음.
+ -5 : roomId 가 DB에 등록되지 않은 id 임.
+ -6 : room 과 user 간에 관련성이 없음.
