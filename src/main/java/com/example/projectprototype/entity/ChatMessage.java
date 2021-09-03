@@ -2,13 +2,15 @@ package com.example.projectprototype.entity;
 
 import com.example.projectprototype.entity.enums.MessageType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
+@Getter @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "chatmessage")
-@Getter @Setter
 public class ChatMessage extends TimeEntity {
 
     @Id
