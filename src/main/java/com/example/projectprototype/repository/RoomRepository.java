@@ -20,6 +20,9 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     void updateStatus(@Param(value = "id") Long id,
             @Param(value = "status") String status);
 
+    @Query("update room r set r.title = :title where r.id = :id")
+    void updateTitle(@Param(value = "id") Long id, @Param(value = "title") String title);
+
     @Query(value =
             "SELECT r.* FROM (SELECT * FROM room WHERE status = 'active') r " +
             "JOIN (SELECT * FROM participant WHERE user_id = ?1) p ON r.id = p.room_id"

@@ -7,8 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResponseDto {
-
-    private int code;
-    private int interCode;
+public class UpdateTitleRequestDto {
+    String title;
 }

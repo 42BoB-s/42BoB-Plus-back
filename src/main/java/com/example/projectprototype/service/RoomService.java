@@ -1,15 +1,12 @@
 package com.example.projectprototype.service;
 
-import com.example.projectprototype.dto.ListDto;
 import com.example.projectprototype.dto.RoomDto;
 import com.example.projectprototype.dto.SearchRoomsRequestDto;
-import com.example.projectprototype.dto.UserDto;
 import com.example.projectprototype.entity.*;
 import com.example.projectprototype.entity.enums.Location;
 import com.example.projectprototype.entity.enums.MenuName;
 import com.example.projectprototype.entity.enums.RoomStatus;
 import com.example.projectprototype.mapper.RoomMapper;
-import com.example.projectprototype.mapper.UserMapper;
 import com.example.projectprototype.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -99,11 +96,6 @@ public class RoomService {
        return roomDtoList;
     }
 
-    /**
-     * location default 일때는 LIKE 로 커버
-     * menu 도 default 일때는 모든 메뉴를 list 에 넣도록 커버
-     * time 이 default 일때는 쿼리를 따로 만들어서 커버
-     */
     public List<RoomDto> searchRooms(String userId, SearchRoomsRequestDto reqDto, Pageable pageable) {
 
         List<RoomDto> roomDtoList = new ArrayList<>();
@@ -152,7 +144,7 @@ public class RoomService {
         Long id = isParsableRoomId(roomId);
         if (id < 0L) return -1L;
         // roomId 로 DB 에서 room 이 조회되는지
-        Optional<Room> room = roomRepository.findById(isParsableRoomId(roomId));
+        Optional<Room> room = roomRepository.findById(id);
         if (room.isEmpty()) return -3L;
         // 해당 room 에 userId 가 속해있는지
         if (!partService.isParticipant(room.get(), userId)) return -5L;
@@ -164,6 +156,21 @@ public class RoomService {
             roomRepository.updateStatus(id,RoomStatus.failed.toString());
         }
         return room.get().getId();
+    }
+
+    public Long updateTitle(String title, String roomId, String userId) {
+
+        // title 이 공백이면 안됨.
+        if (title.equals("") || title == null) return -1L;
+        // roomId parsing 여부 확인
+        Long id = isParsableRoomId(roomId); if (id < 0L) return -1L;
+        // room 조회 확인
+        Optional<Room> room = roomRepository.findById(id); if (room.isEmpty()) return -3L;
+        // 권한 조회
+        if (!room.get().getOwner().equals(userId)) return -5L;
+
+        roomRepository.updateTitle(id, title);
+        return id;
     }
 
     // RoomDto 를 room 엔티티로 변환

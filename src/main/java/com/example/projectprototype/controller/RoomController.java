@@ -138,6 +138,27 @@ public class RoomController {
         return entity;
     }
 
+    @PutMapping("room/title/{roomid}")
+    public ResponseEntity<HashMap<String, Object>> updateTitle(HttpServletRequest req, HttpServletResponse resp,
+                                                                @RequestBody UpdateTitleRequestDto titleDto,
+                                                                @PathVariable String roomid) {
+        SessionDto sessionDTO = sessionCheck(req);
+        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
+            redirectLogin(resp);
+
+        ResponseEntity<HashMap<String, Object>> entity;
+        HashMap<String, Object> resultMap = new HashMap<>();
+
+        long result = roomService.updateTitle(titleDto.getTitle(), roomid, sessionDTO.getUserId());
+
+        if (result < 0L)
+            entity = new ResponseEntity<>(resultMap, HttpStatus.FORBIDDEN);
+        else
+            entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+        resultMap.put("interCode", (int) result);
+        return entity;
+    }
+
     private void redirectLogin(HttpServletResponse resp) {
         try {
             resp.sendRedirect(baseUrl + "login");
