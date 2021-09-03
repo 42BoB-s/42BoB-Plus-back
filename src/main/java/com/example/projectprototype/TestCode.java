@@ -35,7 +35,9 @@ public class TestCode {
     @PostConstruct
     public void poc() {
         User user = createTestUser("tjeong", "/img/tjeong", "1");
+        User user2 = createTestUser("tjeong2", "/img/tjeong", "1");
         userRepository.save(user);
+        userRepository.save(user2);
 
         List<String> menuExpected = new ArrayList<>();
         menuExpected.add("중식");
@@ -43,16 +45,16 @@ public class TestCode {
         menuExpected.add("커피");
 
         List<String> meetTimeList = new ArrayList<>();
-        meetTimeList.add("2021-09-01 01:00:00");
-        meetTimeList.add("2021-09-01 02:00:00");
-        meetTimeList.add("2021-09-01 03:00:00");
-        meetTimeList.add("2021-09-01 04:00:00");
-        meetTimeList.add("2021-09-01 05:00:00");
-        meetTimeList.add("2021-09-01 06:00:00");
-        meetTimeList.add("2021-09-01 07:00:00");
-        meetTimeList.add("2021-09-01 08:00:00");
-        meetTimeList.add("2021-09-01 09:00:00");
-        meetTimeList.add("2021-09-01 10:00:00");
+        meetTimeList.add("2021-09-10 01:00:00");
+        meetTimeList.add("2021-09-10 02:00:00");
+        meetTimeList.add("2021-09-10 03:00:00");
+        meetTimeList.add("2021-09-10 04:00:00");
+        meetTimeList.add("2021-09-10 05:00:00");
+        meetTimeList.add("2021-09-10 06:00:00");
+        meetTimeList.add("2021-09-10 07:00:00");
+        meetTimeList.add("2021-09-10 08:00:00");
+        meetTimeList.add("2021-09-10 09:00:00");
+        meetTimeList.add("2021-09-10 10:00:00");
 
         for (int i = 0; i < 10 ; i++) {
             RoomDto roomDTO = new RoomDto();
@@ -65,10 +67,19 @@ public class TestCode {
             roomDTO.setAnnouncement("announcement");
             roomDTO.setMenus(menuExpected);
             roomService.createRoom(roomDTO, user.getId());
+
+            RoomDto roomDTO2 = new RoomDto();
+            roomDTO2.setOwner(userService.convertToUserDto(user2));
+            roomDTO2.setCapacity(4);
+            roomDTO2.setStatus("active");
+            roomDTO2.setTitle("hello_room");
+            roomDTO2.setLocation("서초");
+            roomDTO2.setMeetTime(meetTimeList.get(i));
+            roomDTO2.setAnnouncement("announcement");
+            roomDTO2.setMenus(menuExpected);
+            roomService.createRoom(roomDTO2, user2.getId());
         }
     }
-
-
 
     static User createTestUser(String userId, String profile, String role) {
         User user = new User();
