@@ -198,8 +198,7 @@ public class TotalTest {
 
         participantRepository.save(participant);
 
-        participantRepository.findByRoom(room);
-
+        participantRepository.findByRoomId(room.getId());
     }
 
     static User createTestUser(String userId, String profile, String role) {
