@@ -10,7 +10,6 @@ import com.example.projectprototype.mapper.RoomMapper;
 import com.example.projectprototype.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.util.EnumUtils;
@@ -20,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,22 +38,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RoomService {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final RoomMapper roomMapper;
+
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
-    private final RoomMenuRepository roomMenuRepository;
-    private final MenuRepository menuRepository;
-    private final ParticipantRepository partRepository;
 
     private final UserService userService;
     private final ParticipantService partService;
-    private final RoomMapper roomMapper;
+    private final RoomMenuService rmService;
 
-    // 방생성 : 채팅방 생성은 설정 안되어 있음.
-    // 입력된 시간이 지금보다 전이면 fail 줘야함.
+
     public long createRoom(RoomDto roomDTO, String userId) {
         LocalDateTime inputTime = LocalDateTime.parse(roomDTO.getMeetTime(), formatter);
 
-        if (!isParsableTime(roomDTO.getMeetTime())) return -1L;
+        if (!isTimeFormat(roomDTO.getMeetTime())) return -1L;
         if (!userService.userIdCheck(userId)) return -3L;
         if (!isInLocation(roomDTO.getLocation())) return -4L;
         for (String menuName : roomDTO.getMenus()) {
@@ -63,7 +61,7 @@ public class RoomService {
         List<Room> rooms = roomRepository.findEnteredRoom(userId);
         if (rooms.size() == 0) {
             Room room = convertToRoom(roomDTO, userId);
-            partService.setParticipate(room, userId);
+            partService.mappingRoomAndUser(room, userId);
             return room.getId();
         }
         // 기존에 만들어진 방이 있으면 기존 약속 시간과 비교하여 1시간 이내로 겹치면 -2 return;
@@ -76,13 +74,10 @@ public class RoomService {
         // 제약 조건을 모두 통과하면 roomDTO 를 Room 객체로 만들고 DB에 등록.
         Room room = convertToRoom(roomDTO, userId);
         // participate 테이블에도 mapping
-        partService.setParticipate(room, userId);
+        partService.mappingRoomAndUser(room, userId);
         return room.getId();
     }
 
-    /** 주어진 userId 가 참여중인 active 상태의 방을 DTO로 변환하여 반환
-     * -null 참여중인 방이 없으면
-     */
     public List<RoomDto> searchMyRooms(String userId) {
        // 참여한 방 정보 확인, 참여한 정보가 없으면 null 반환
         List<Room> rooms = roomRepository.findEnteredRoom(userId);
@@ -101,7 +96,7 @@ public class RoomService {
         List<RoomDto> roomDtoList = new ArrayList<>();
 
         // default 값 처리
-        defaultTreat(reqDto);
+        defaultValueProcess(reqDto);
         // menu 값 처리
         List<String> menuNameList = new ArrayList<>();
         getMenuName(reqDto.getMenu(), menuNameList);
@@ -117,16 +112,15 @@ public class RoomService {
     public Long enterRoom(String userId, String roomId) {
 
         // roomId parse 할 수 있는지
-        Long id = isParsableRoomId(roomId);
+        Long id = isRoomIdFormat(roomId);
         if (id < 0L) return -1L;
         // roomId 로 DB 에서 room 이 조회되는지
-        Optional<Room> room = roomRepository.findById(isParsableRoomId(roomId));
+        Optional<Room> room = roomRepository.findById(id);
         if (room.isEmpty()) return -3L;
-        // room.status = 'active' 인지 확인
+        // room.status = 'active' 인지
         if (!room.get().getStatus().equals(RoomStatus.active)) return -6L;
-        // 최대 인원 체크
-        if (room.get().getCapacity() <= partRepository.countByRoomId(id))
-            return -3L;
+        // 참여할 자리가 남은 방인지
+        if (!partService.capacityCheck(room.get())) return -3L;
 
         // 기존에 참여하던 방과 지금 참여하려는 방이 시간이 겹치지 않는지
         List<Room> rooms = roomRepository.findEnteredRoom(userId);
@@ -135,13 +129,13 @@ public class RoomService {
                 return -2L;
             }
         }
-        partService.setParticipate(room.get(), userId);
+        partService.mappingRoomAndUser(room.get(), userId);
         return id;
     }
 
     public Long exitRoom(String userId, String roomId) {
         // roomId parse 할 수 있는지
-        Long id = isParsableRoomId(roomId);
+        Long id = isRoomIdFormat(roomId);
         if (id < 0L) return -1L;
         // roomId 로 DB 에서 room 이 조회되는지
         Optional<Room> room = roomRepository.findById(id);
@@ -160,20 +154,30 @@ public class RoomService {
 
     public Long updateTitle(String title, String roomId, String userId) {
 
-        // title 이 공백이면 안됨.
-        if (title.equals("") || title == null) return -1L;
+        // title 이 공백이면 안됨
+        if (title.equals("")) return -1L;
         // roomId parsing 여부 확인
-        Long id = isParsableRoomId(roomId); if (id < 0L) return -1L;
+        Long id = isRoomIdFormat(roomId); if (id < 0L) return -1L;
         // room 조회 확인
         Optional<Room> room = roomRepository.findById(id); if (room.isEmpty()) return -3L;
         // 권한 조회
-        if (!room.get().getOwner().equals(userId)) return -5L;
+        if (!room.get().getOwner().getId().equals(userId)) return -5L;
 
         roomRepository.updateTitle(id, title);
         return id;
     }
 
-    // RoomDto 를 room 엔티티로 변환
+    // RoomDto 를 Room 엔티티로 변환
+    /* 이 하나의 메서드가 너무 많은 책임을 가지고 있지 않나?
+     * 메서드 이름만 보면 RoomDto 를 Room 으로 바꿔주는 정도만 할것 같은데, 아래의 두 가지 초과 기능이 있다.
+     * e1. Room 을 DB 에 저장하는 역할
+     * e2. Room 과 roomMenu 를 mapping 하고 room_menu 테이블에 저장하는 역할
+     *
+     * 하지만 Room 엔티티는 적어도 Menu 가 매핑된 상태여야하는데 room 과 menu 를 매핑하려면 room 이 DB 에 저장된 상태여야한다.
+     * 그렇기 때문에 RoomDto 를 Room 엔티티로 변환하는것은 암묵적으로 이러한 기능을 갖춰고 있어야 하는게 아닐까?
+     *
+     * convertToRoom 이건 문제가 있음.
+     */
     public Room convertToRoom(RoomDto roomDTO, String userId) {
 
         Room room = roomMapper.toEntity(roomDTO);
@@ -184,10 +188,7 @@ public class RoomService {
         roomRepository.save(room);
         // Room 과 Menu 를 매핑하는 RoomMenu 객체를 만들어서 roomMenuList 에 저장
         for (String menuName : roomDTO.getMenus()) {
-            RoomMenu roomMenu = new RoomMenu();
-            roomMenu.setRoom(room);
-            roomMenu.setMenu(menuRepository.findByName(MenuName.valueOf(menuName)));
-            roomMenuRepository.save(roomMenu);
+            rmService.mappingRoomAndMenu(room, menuName);
         }
         return room;
     }
@@ -207,16 +208,16 @@ public class RoomService {
         return roomDTO;
     }
 
-    public int paramsCheck(SearchRoomsRequestDto reqDto) {
-        if (!isInLocation(reqDto.getLocation())) return -4;
-        if (!isInMenuName(reqDto.getMenu())) return -4;
-        if (!isParsableTime(reqDto.getStartTime())) return -1;
-        if (!isParsableTime(reqDto.getEndTime())) return -1;
+    public Long paramsCheck(SearchRoomsRequestDto reqDto) {
+        if (!isInLocation(reqDto.getLocation())) return -4L;
+        if (!isInMenuName(reqDto.getMenu())) return -4L;
+        if (!isTimeFormat(reqDto.getStartTime())) return -1L;
+        if (!isTimeFormat(reqDto.getEndTime())) return -1L;
 
-        return 0;
+        return 0L;
     }
 
-    private void defaultTreat(SearchRoomsRequestDto reqDto) {
+    private void defaultValueProcess(SearchRoomsRequestDto reqDto) {
 
         if (reqDto.getKeyword().equals("default")) reqDto.setKeyword("%");
         else {
@@ -224,31 +225,30 @@ public class RoomService {
             reqDto.setKeyword("%" + tmp + "%");
         }
         if (reqDto.getLocation().equals("default")) reqDto.setLocation("%");
-        if (reqDto.getStartTime().equals("dafault") || reqDto.getEndTime().equals("dafault")) {
+        if (reqDto.getStartTime().equals("default") || reqDto.getEndTime().equals("default")) {
             reqDto.setStartTime(LocalDateTime.now().minusMinutes(30).format(formatter));
             reqDto.setEndTime(LocalDateTime.now().plusHours(25).format(formatter));
         }
+        System.err.println("as default process result");
+        System.err.println("location : " + reqDto.getLocation());
+        System.err.println("menu : " + reqDto.getMenu());
+        System.err.println("startTime : " + reqDto.getStartTime());
+        System.err.println("endTime : " + reqDto.getEndTime());
+        System.err.println("keyword : " + reqDto.getKeyword());
     }
 
     private void getMenuName(String menu, List<String> menuNameList) {
         if (menu.equals("default")) {
-            for (String menuName : MenuName.getNames(MenuName.class)) {
-                menuNameList.add(menuName);
-            }
+            Collections.addAll(menuNameList, MenuName.getNames(MenuName.class));
         } else {
             String[] menuArr = menu.split(",");
-            for (String menuName : menuArr) {
-                menuNameList.add(menuName);
-            }
+            Collections.addAll(menuNameList, menuArr);
         }
     }
 
-    /**
-     * 입력된 시간 값이 기존 약속 시간에서 1시간 내외 안에 있는지 확인
-     * 11:00, 12:00 : true
-     * 11:00, 11:30 or 10:30 : false
-     */
-    public boolean isValidTime(LocalDateTime time1, LocalDateTime time2) {
+
+     // 입력된 시간 값이 기존 약속 시간에서 1시간 내외 안에 있는지 확인
+    private boolean isValidTime(LocalDateTime time1, LocalDateTime time2) {
         if (time1.isAfter(time2)) {
             return time2.plusHours(1).isBefore(time1);
         } else {
@@ -256,7 +256,7 @@ public class RoomService {
         }
     }
 
-    public boolean isParsableTime(String time) {
+    private boolean isTimeFormat(String time) {
         if (time.equals("default")) return true;
         try {
             LocalDateTime.parse(time, formatter);
@@ -267,7 +267,7 @@ public class RoomService {
         return true;
     }
 
-    public Long isParsableRoomId(String roomId) {
+    private Long isRoomIdFormat(String roomId) {
         try {
             return Long.parseLong(roomId);
         } catch (RuntimeException e) {
@@ -277,7 +277,7 @@ public class RoomService {
     }
 
     // 주어진 String 이 Location enum 에 포함된 값인지 확인
-    public boolean isInLocation(String location) {
+    private boolean isInLocation(String location) {
         if (location.equals("default")) return true;
         try {
             EnumUtils.findEnumInsensitiveCase(Location.class, location);
@@ -289,7 +289,7 @@ public class RoomService {
     }
 
     // 주어진 String 이 MenuName enum 에 포함된 값인지 확인
-    public boolean isInMenuName(String menuName) {
+    private boolean isInMenuName(String menuName) {
         if (menuName.equals("default")) return true;
         try {
             String[] menuNameArr = menuName.split(",");
