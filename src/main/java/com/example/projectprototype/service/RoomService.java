@@ -175,8 +175,6 @@ public class RoomService {
      *
      * 하지만 Room 엔티티는 적어도 Menu 가 매핑된 상태여야하는데 room 과 menu 를 매핑하려면 room 이 DB 에 저장된 상태여야한다.
      * 그렇기 때문에 RoomDto 를 Room 엔티티로 변환하는것은 암묵적으로 이러한 기능을 갖춰고 있어야 하는게 아닐까?
-     *
-     * convertToRoom 이건 문제가 있음.
      */
     public Room convertToRoom(RoomDto roomDTO, String userId) {
 
@@ -229,12 +227,6 @@ public class RoomService {
             reqDto.setStartTime(LocalDateTime.now().minusMinutes(30).format(formatter));
             reqDto.setEndTime(LocalDateTime.now().plusHours(25).format(formatter));
         }
-        System.err.println("as default process result");
-        System.err.println("location : " + reqDto.getLocation());
-        System.err.println("menu : " + reqDto.getMenu());
-        System.err.println("startTime : " + reqDto.getStartTime());
-        System.err.println("endTime : " + reqDto.getEndTime());
-        System.err.println("keyword : " + reqDto.getKeyword());
     }
 
     private void getMenuName(String menu, List<String> menuNameList) {

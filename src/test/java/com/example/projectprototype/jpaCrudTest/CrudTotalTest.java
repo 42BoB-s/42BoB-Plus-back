@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @SpringBootTest
 @Transactional
-public class TotalTest {
+public class CrudTotalTest {
 
     @Autowired
     private UserRepository userRepository;

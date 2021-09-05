@@ -17,7 +17,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     List<Participant> findByRoomId(Long roomId);
     List<Participant> findByUserId(String userId);
 
-
+    void deleteByUserId(String userId);
+    void deleteByRoomId(Long roomId);
     long countByRoomId(Long roomId);
 
 }

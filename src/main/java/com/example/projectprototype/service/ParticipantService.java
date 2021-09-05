@@ -20,7 +20,7 @@ public class ParticipantService {
 
     private final UserService userService;
 
-    public long setParticipate(Room room, String userId) {
+    public long mappingRoomAndUser(Room room, String userId) {
         if (!userService.userIdCheck(userId)) return -3L;
 
         Participant participant = new Participant();
@@ -30,6 +30,12 @@ public class ParticipantService {
         return room.getId();
     }
 
+    // 방 인원수를 체크하여 참여가능 : ture / 참여불능 : false
+    public boolean capacityCheck(Room room){
+        return room.getCapacity() > partRepository.countByRoomId(room.getId());
+    }
+
+    // 해당 userId 가 room 에 참여하고 있는지 확인
     public boolean isParticipant(Room room, String userId) {
         for (Participant part : room.getParticipantList()) {
             if(part.getUser().getId().equals(userId))

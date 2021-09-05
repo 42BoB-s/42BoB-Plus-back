@@ -28,9 +28,10 @@ public class RoomController {
     private final RoomService roomService;
 
     // 방 생성
-    @PostMapping("/room")
+    @GetMapping("/room")
     public ResponseEntity<HashMap<String, Object>> createRoom(RoomDto roomDTO,
                                                               HttpServletRequest req, HttpServletResponse resp) {
+
         // session 값이 있는지 확인, 없으면 login 화면으로 보내기.
         // session 값이 있으면, 주어진 session 값에 id가 등록된 회원인지 확인
         SessionDto sessionDTO = sessionCheck(req);
@@ -74,8 +75,7 @@ public class RoomController {
     // 필터링된 방 조회
     @GetMapping("/rooms")
     public ResponseEntity<HashMap<String, Object>> searchRooms(HttpServletRequest req, HttpServletResponse resp,
-                                        Pageable pageable, SearchRoomsRequestDto reqDto,
-                                                               @RequestParam String userId) {
+                                        Pageable pageable, SearchRoomsRequestDto reqDto) {
 
         SessionDto sessionDTO = sessionCheck(req);
         if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
@@ -91,14 +91,14 @@ public class RoomController {
             return entity;
         }
 
-        List<RoomDto> roomDtoList = roomService.searchRooms(userId,reqDto, pageable);
+        List<RoomDto> roomDtoList = roomService.searchRooms(sessionDTO.getUserId(), reqDto, pageable);
         resultMap.put("interCode", 1);
         resultMap.put("List<RoomDto>", roomDtoList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }
 
-    @PatchMapping("/room/{roomid}")
+    @PatchMapping("/room/enter/{roomid}")
     public ResponseEntity<HashMap<String, Object>> enterRoom(HttpServletRequest req, HttpServletResponse resp,
                                        @PathVariable String roomid){
 
@@ -118,7 +118,7 @@ public class RoomController {
         return entity;
     }
 
-    @DeleteMapping("/room/{roomid}")
+    @DeleteMapping("/room/exit/{roomid}")
     public ResponseEntity<HashMap<String, Object>> exitRoom(HttpServletRequest req, HttpServletResponse resp,
                                 @PathVariable String roomid) {
 
@@ -172,10 +172,6 @@ public class RoomController {
         if (session == null) {
             return null;
         }
-        SessionDto sessionDTO = (SessionDto)session.getAttribute("session");
-        if (sessionDTO == null) {
-            return null;
-        }
-        return sessionDTO;
+        return (SessionDto)session.getAttribute("session");
     }
 }

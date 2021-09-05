@@ -1,27 +1,24 @@
 package com.example.projectprototype.repository;
 
-import com.example.projectprototype.entity.Participant;
 import com.example.projectprototype.entity.Room;
-import com.example.projectprototype.entity.enums.RoomStatus;
+import com.example.projectprototype.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import java.util.List;
-import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     List<Room> findAll();
+    List<Room> findByOwner(User user);
 
-    @Query("update room r set r.status = :status where r.id = :id")
-    void updateStatus(@Param(value = "id") Long id,
-            @Param(value = "status") String status);
+    @Query(value = "update Room r set r.status = ?2 where r.id = ?1 ", nativeQuery = true)
+    void updateStatus(Long id, String status);
 
-    @Query("update room r set r.title = :title where r.id = :id")
-    void updateTitle(@Param(value = "id") Long id, @Param(value = "title") String title);
+    @Query(value = "update Room r set r.title = ?2 where r.id = ?1", nativeQuery = true)
+    void updateTitle(Long id, String title);
 
     @Query(value =
             "SELECT r.* FROM (SELECT * FROM room WHERE status = 'active') r " +
