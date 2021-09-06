@@ -43,6 +43,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
 
+    private final RoomServiceUtil serviceUtil;
     private final UserService userService;
     private final ParticipantService partService;
     private final RoomMenuService rmService;
@@ -51,11 +52,11 @@ public class RoomService {
     public long createRoom(RoomDto roomDTO, String userId) {
         LocalDateTime inputTime = LocalDateTime.parse(roomDTO.getMeetTime(), formatter);
 
-        if (!isTimeFormat(roomDTO.getMeetTime())) return -1L;
+        if (!serviceUtil.isTimeFormat(roomDTO.getMeetTime())) return -1L;
         if (!userService.userIdCheck(userId)) return -3L;
-        if (!isInLocation(roomDTO.getLocation())) return -4L;
+        if (!serviceUtil.isInLocation(roomDTO.getLocation())) return -4L;
         for (String menuName : roomDTO.getMenus()) {
-            if (!isInMenuName(menuName)) return -4L;
+            if (!serviceUtil.isInMenuName(menuName)) return -4L;
         }
         // 기존에 만들어진 방이 없으면 방 생성해서 return
         List<Room> rooms = roomRepository.findEnteredRoom(userId);
@@ -67,9 +68,7 @@ public class RoomService {
         // 기존에 만들어진 방이 있으면 기존 약속 시간과 비교하여 1시간 이내로 겹치면 -2 return;
         for (Room loopRoom : rooms) {
             LocalDateTime priorTime = loopRoom.getMeetTime();
-            if (!isValidTime(priorTime, inputTime)) {
-                return -2L;
-            }
+            if (!serviceUtil.isValidTime(priorTime, inputTime)) return -2L;
         }
         // 제약 조건을 모두 통과하면 roomDTO 를 Room 객체로 만들고 DB에 등록.
         Room room = convertToRoom(roomDTO, userId);
@@ -96,10 +95,10 @@ public class RoomService {
         List<RoomDto> roomDtoList = new ArrayList<>();
 
         // default 값 처리
-        defaultValueProcess(reqDto);
+        serviceUtil.defaultValueProcess(reqDto);
         // menu 값 처리
         List<String> menuNameList = new ArrayList<>();
-        getMenuName(reqDto.getMenu(), menuNameList);
+        serviceUtil.getMenuName(reqDto.getMenu(), menuNameList);
         // DB 조회
         Page<Room> roomPage = roomRepository.searchRooms(reqDto.getLocation(), reqDto.getStartTime(),
                 reqDto.getEndTime(), reqDto.getKeyword(), userId, menuNameList, pageable);
@@ -112,7 +111,7 @@ public class RoomService {
     public Long enterRoom(String userId, String roomId) {
 
         // roomId parse 할 수 있는지
-        Long id = isRoomIdFormat(roomId);
+        Long id = serviceUtil.isRoomIdFormat(roomId);
         if (id < 0L) return -1L;
         // roomId 로 DB 에서 room 이 조회되는지
         Optional<Room> room = roomRepository.findById(id);
@@ -125,9 +124,7 @@ public class RoomService {
         // 기존에 참여하던 방과 지금 참여하려는 방이 시간이 겹치지 않는지
         List<Room> rooms = roomRepository.findEnteredRoom(userId);
         for (Room loopRoom : rooms) {
-            if (!isValidTime(loopRoom.getMeetTime(), room.get().getMeetTime())) {
-                return -2L;
-            }
+            if (!serviceUtil.isValidTime(loopRoom.getMeetTime(), room.get().getMeetTime())) return -2L;
         }
         partService.mappingRoomAndUser(room.get(), userId);
         return id;
@@ -135,7 +132,7 @@ public class RoomService {
 
     public Long exitRoom(String userId, String roomId) {
         // roomId parse 할 수 있는지
-        Long id = isRoomIdFormat(roomId);
+        Long id = serviceUtil.isRoomIdFormat(roomId);
         if (id < 0L) return -1L;
         // roomId 로 DB 에서 room 이 조회되는지
         Optional<Room> room = roomRepository.findById(id);
@@ -146,9 +143,8 @@ public class RoomService {
         // 방장 넘기기, room.participantList 에서 삭제, participant 를 DB 에서 삭제
         // return : 남은 참여자 숫자.
         long result = partService.cancelParticipation(room.get(), userId);
-        if (result == 0) {
+        if (result == 0)
             roomRepository.updateStatus(id,RoomStatus.failed.toString());
-        }
         return room.get().getId();
     }
 
@@ -157,7 +153,7 @@ public class RoomService {
         // title 이 공백이면 안됨
         if (title.equals("")) return -1L;
         // roomId parsing 여부 확인
-        Long id = isRoomIdFormat(roomId); if (id < 0L) return -1L;
+        Long id = serviceUtil.isRoomIdFormat(roomId); if (id < 0L) return -1L;
         // room 조회 확인
         Optional<Room> room = roomRepository.findById(id); if (room.isEmpty()) return -3L;
         // 권한 조회
@@ -168,14 +164,6 @@ public class RoomService {
     }
 
     // RoomDto 를 Room 엔티티로 변환
-    /* 이 하나의 메서드가 너무 많은 책임을 가지고 있지 않나?
-     * 메서드 이름만 보면 RoomDto 를 Room 으로 바꿔주는 정도만 할것 같은데, 아래의 두 가지 초과 기능이 있다.
-     * e1. Room 을 DB 에 저장하는 역할
-     * e2. Room 과 roomMenu 를 mapping 하고 room_menu 테이블에 저장하는 역할
-     *
-     * 하지만 Room 엔티티는 적어도 Menu 가 매핑된 상태여야하는데 room 과 menu 를 매핑하려면 room 이 DB 에 저장된 상태여야한다.
-     * 그렇기 때문에 RoomDto 를 Room 엔티티로 변환하는것은 암묵적으로 이러한 기능을 갖춰고 있어야 하는게 아닐까?
-     */
     public Room convertToRoom(RoomDto roomDTO, String userId) {
 
         Room room = roomMapper.toEntity(roomDTO);
@@ -207,91 +195,11 @@ public class RoomService {
     }
 
     public Long paramsCheck(SearchRoomsRequestDto reqDto) {
-        if (!isInLocation(reqDto.getLocation())) return -4L;
-        if (!isInMenuName(reqDto.getMenu())) return -4L;
-        if (!isTimeFormat(reqDto.getStartTime())) return -1L;
-        if (!isTimeFormat(reqDto.getEndTime())) return -1L;
+        if (!serviceUtil.isInLocation(reqDto.getLocation())) return -4L;
+        if (!serviceUtil.isInMenuName(reqDto.getMenu())) return -4L;
+        if (!serviceUtil.isTimeFormat(reqDto.getStartTime())) return -1L;
+        if (!serviceUtil.isTimeFormat(reqDto.getEndTime())) return -1L;
 
         return 0L;
-    }
-
-    private void defaultValueProcess(SearchRoomsRequestDto reqDto) {
-
-        if (reqDto.getKeyword().equals("default")) reqDto.setKeyword("%");
-        else {
-            String tmp = reqDto.getKeyword();
-            reqDto.setKeyword("%" + tmp + "%");
-        }
-        if (reqDto.getLocation().equals("default")) reqDto.setLocation("%");
-        if (reqDto.getStartTime().equals("default") || reqDto.getEndTime().equals("default")) {
-            reqDto.setStartTime(LocalDateTime.now().minusMinutes(30).format(formatter));
-            reqDto.setEndTime(LocalDateTime.now().plusHours(25).format(formatter));
-        }
-    }
-
-    private void getMenuName(String menu, List<String> menuNameList) {
-        if (menu.equals("default")) {
-            Collections.addAll(menuNameList, MenuName.getNames(MenuName.class));
-        } else {
-            String[] menuArr = menu.split(",");
-            Collections.addAll(menuNameList, menuArr);
-        }
-    }
-
-
-     // 입력된 시간 값이 기존 약속 시간에서 1시간 내외 안에 있는지 확인
-    private boolean isValidTime(LocalDateTime time1, LocalDateTime time2) {
-        if (time1.isAfter(time2)) {
-            return time2.plusHours(1).isBefore(time1);
-        } else {
-            return time1.plusHours(1).isBefore(time2);
-        }
-    }
-
-    private boolean isTimeFormat(String time) {
-        if (time.equals("default")) return true;
-        try {
-            LocalDateTime.parse(time, formatter);
-        } catch (DateTimeParseException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    private Long isRoomIdFormat(String roomId) {
-        try {
-            return Long.parseLong(roomId);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            return -1L;
-        }
-    }
-
-    // 주어진 String 이 Location enum 에 포함된 값인지 확인
-    private boolean isInLocation(String location) {
-        if (location.equals("default")) return true;
-        try {
-            EnumUtils.findEnumInsensitiveCase(Location.class, location);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    // 주어진 String 이 MenuName enum 에 포함된 값인지 확인
-    private boolean isInMenuName(String menuName) {
-        if (menuName.equals("default")) return true;
-        try {
-            String[] menuNameArr = menuName.split(",");
-            for (String menuNameSplit : menuNameArr) {
-                EnumUtils.findEnumInsensitiveCase(MenuName.class, menuNameSplit);
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
     }
 }

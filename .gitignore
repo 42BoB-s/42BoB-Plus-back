@@ -2,6 +2,7 @@
 .idea
 .gradle
 *.iml
+.jpa
 build
 out
 gen
