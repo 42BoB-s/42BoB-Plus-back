@@ -13,4 +13,6 @@ public interface RoomMenuRepository extends JpaRepository<RoomMenu, Long> {
 
     Optional<List<RoomMenu>> findByRoom(Room room);
     Optional<List<RoomMenu>> findByMenu(Menu menu);
+
+    void deleteAllByRoomId(Long roomId);
 }

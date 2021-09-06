@@ -1,0 +1,13 @@
+# IntelliJ project files
+.idea
+.gradle
+*.iml
+.jpa
+build
+out
+gen
+
+# DB info
+application.tar
+application.yml
+src/test/resources/application.properties
