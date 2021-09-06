@@ -1,11 +1,11 @@
 package com.example.projectprototype;
 
 import com.example.projectprototype.dto.RoomDto;
-import com.example.projectprototype.entity.Room;
 import com.example.projectprototype.entity.User;
+import com.example.projectprototype.mapper.UserMapper;
 import com.example.projectprototype.repository.RoomRepository;
 import com.example.projectprototype.repository.UserRepository;
-import com.example.projectprototype.service.RoomService;
+import com.example.projectprototype.service.RoomServiceImpl;
 import com.example.projectprototype.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,8 +22,8 @@ public class TestSetting {
 
     private final UserService userService;
     private final UserRepository userRepository;
-    private final RoomService roomService;
-    private final RoomRepository roomRepository;
+    private final RoomServiceImpl roomServiceImpl;
+    private final UserMapper userMapper;
 
     @PostConstruct
     void poc() {
@@ -54,7 +54,7 @@ public class TestSetting {
     private void setTestRoom(User user, String location, String title, String notice,
                             String meetTime, List<String> menuList) {
         RoomDto roomDTO = new RoomDto();
-        roomDTO.setOwner(userService.convertToUserDto(user));
+        roomDTO.setOwner(userMapper.convertToUserDto(user));
         roomDTO.setCapacity(1);
         roomDTO.setStatus("active");
         roomDTO.setTitle(title);
@@ -62,6 +62,6 @@ public class TestSetting {
         roomDTO.setMeetTime(meetTime);
         roomDTO.setAnnouncement(notice);
         roomDTO.setMenus(menuList);
-        roomService.createRoom(roomDTO, user.getId());
+        roomServiceImpl.createRoom(roomDTO, user.getId());
     }
 }

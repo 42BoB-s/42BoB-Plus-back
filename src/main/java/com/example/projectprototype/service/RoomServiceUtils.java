@@ -3,6 +3,7 @@ package com.example.projectprototype.service;
 import com.example.projectprototype.dto.SearchRoomsRequestDto;
 import com.example.projectprototype.entity.enums.Location;
 import com.example.projectprototype.entity.enums.MenuName;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.util.EnumUtils;
 
@@ -13,9 +14,9 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-
-public class RoomServiceUtil {
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+@RequiredArgsConstructor
+public class RoomServiceUtils {
+    public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public void defaultValueProcess(SearchRoomsRequestDto reqDto) {
 
@@ -39,7 +40,6 @@ public class RoomServiceUtil {
             Collections.addAll(menuNameList, menuArr);
         }
     }
-
 
     // 입력된 시간 값이 기존 약속 시간에서 1시간 내외 안에 있는지 확인
     public boolean isValidTime(LocalDateTime time1, LocalDateTime time2) {

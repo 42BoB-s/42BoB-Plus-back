@@ -1,17 +1,16 @@
 package com.example.projectprototype.roomServiceTest;
 
 import com.example.projectprototype.dto.RoomDto;
-import com.example.projectprototype.entity.Menu;
 import com.example.projectprototype.entity.Room;
 import com.example.projectprototype.entity.RoomMenu;
 import com.example.projectprototype.entity.User;
 import com.example.projectprototype.entity.enums.Location;
-import com.example.projectprototype.entity.enums.MenuName;
+import com.example.projectprototype.mapper.UserMapper;
 import com.example.projectprototype.repository.ParticipantRepository;
 import com.example.projectprototype.repository.RoomMenuRepository;
 import com.example.projectprototype.repository.RoomRepository;
 import com.example.projectprototype.repository.UserRepository;
-import com.example.projectprototype.service.RoomService;
+import com.example.projectprototype.service.RoomServiceImpl;
 import com.example.projectprototype.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,11 +25,12 @@ import java.util.List;
 
 @SpringBootTest
 @Transactional
-public class RoomServiceTotalTest {
+public class RoomServiceImplTotalTest {
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @Autowired private RoomService roomService;
+    @Autowired private RoomServiceImpl roomServiceImpl;
+    @Autowired private UserMapper userMapper;
     @Autowired private UserService userService;
     @Autowired private RoomRepository roomRepository;
     @Autowired private UserRepository userRepository;
@@ -98,7 +98,7 @@ public class RoomServiceTotalTest {
     public void setTestRoom(User user, String location, String title, String notice,
                                  String meetTime, List<String> menuList) {
         RoomDto roomDTO = new RoomDto();
-        roomDTO.setOwner(userService.convertToUserDto(user));
+        roomDTO.setOwner(userMapper.convertToUserDto(user));
         roomDTO.setCapacity(1);
         roomDTO.setStatus("active");
         roomDTO.setTitle(title);
@@ -106,6 +106,6 @@ public class RoomServiceTotalTest {
         roomDTO.setMeetTime(meetTime);
         roomDTO.setAnnouncement(notice);
         roomDTO.setMenus(menuList);
-        roomService.createRoom(roomDTO, user.getId());
+        roomServiceImpl.createRoom(roomDTO, user.getId());
     }
 }

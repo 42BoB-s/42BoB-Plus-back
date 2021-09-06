@@ -2,6 +2,7 @@ package com.example.projectprototype.controller;
 
 import com.example.projectprototype.dto.*;
 import com.example.projectprototype.service.RoomService;
+import com.example.projectprototype.service.RoomServiceImpl;
 import com.example.projectprototype.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
