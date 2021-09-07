@@ -27,6 +27,7 @@ public class LoginController {
                       @RequestParam(value = "code") String code) {
         String token = loginService.getOAuthToken(code);
         SessionDto sessionDto = loginService.getUserInfo(token);
+        loginService.processNewUser(sessionDto);
         //임시
         HttpSession httpSession = loginService.getSession(req, sessionDto);
         try {
@@ -45,7 +46,7 @@ public class LoginController {
     public String logout(HttpSession httpSession)
     {
         if (httpSession != null)
-            loginService.destorySession(httpSession);
+            loginService.destroySession(httpSession);
         return "login";
     }
 }
