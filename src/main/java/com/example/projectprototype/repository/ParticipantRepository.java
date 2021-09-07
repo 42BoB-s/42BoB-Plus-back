@@ -20,5 +20,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     void deleteByUserId(String userId);
     void deleteByRoomId(Long roomId);
     long countByRoomId(Long roomId);
+    Participant findParticipantByRoomEqualsAndUserEquals(Room room, User user);
 
 }
