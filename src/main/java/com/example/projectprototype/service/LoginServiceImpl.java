@@ -30,10 +30,9 @@ public class LoginServiceImpl implements LoginService{
     @Value("${42OAuthSecret}")
     String secret;
     @Value("${baseUrl}")
-    String redirectUri;
+    String baseUrl;
 
     public String getOAuthToken(String code) {
-        redirectUri += "42OAuth";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> request = new HttpEntity<String>(headers);
@@ -43,10 +42,9 @@ public class LoginServiceImpl implements LoginService{
                 + "&client_id=" + uid
                 + "&client_secret=" +secret
                 + "&code=" + code
-                + "&redirect_uri=" + redirectUri;
+                + "&redirect_uri=" + baseUrl + "42OAuth"; // 42OAuth 는 API 발급할때 지정된 redirect URL
         response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, request, String.class);
 
-        //parse를 쓰지 않고, dto로 넘길수도 있다는 모양. (추후 받아올 데이터가 늘어나면 변경예정)
         JSONParser parser = new JSONParser();
         String access_token = null;
         try{
@@ -75,7 +73,7 @@ public class LoginServiceImpl implements LoginService{
         try{
             Object obj = parser.parse(response.getBody());
             JSONObject jsonObj = (JSONObject) obj;
-            sessionDto.setUserId((String)jsonObj.get("login"));
+            sessionDto.setUserId((String)jsonObj.get("login.html"));
             sessionDto.setEmail((String)jsonObj.get("email"));
             sessionDto.setProfile((String)jsonObj.get("image_url")); // https://api.intra.42.fr/apidoc/2.0/users/me.html 를 참조하여 get(image_url)
         }catch (Exception e) {
@@ -84,6 +82,7 @@ public class LoginServiceImpl implements LoginService{
         return sessionDto;
     }
 
+    // userId 가 DB 에 없다면 user 정보를 등록
     public void processNewUser(SessionDto sessionDto) {
         // 해당 user 정보가 없다면 sessionDto 정보로 user 생성
         if (!userService.userIdCheck(sessionDto.getUserId()))
@@ -94,7 +93,7 @@ public class LoginServiceImpl implements LoginService{
 
         HttpSession session = req.getSession();
 
-        if ((SessionDto)session.getAttribute("session") == null)
+        if (session.getAttribute("session") == null)
             session.setAttribute("session", sessionDto);
         return session;
     }

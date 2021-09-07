@@ -24,6 +24,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '2.5.3'
     implementation 'org.mapstruct:mapstruct:1.4.1.Final'
     implementation 'org.projectlombok:lombok:1.18.20'
+    implementation group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.11.RELEASE'
     compileOnly 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
