@@ -72,7 +72,7 @@ public class LoginServiceImpl implements LoginService{
         try{
             Object obj = parser.parse(response.getBody());
             JSONObject jsonObj = (JSONObject) obj;
-            sessionDto.setUserId((String)jsonObj.get("login.html"));
+            sessionDto.setUserId((String)jsonObj.get("login"));
             sessionDto.setEmail((String)jsonObj.get("email"));
             sessionDto.setProfile((String)jsonObj.get("image_url")); // https://api.intra.42.fr/apidoc/2.0/users/me.html 를 참조하여 get(image_url)
         }catch (Exception e) {
