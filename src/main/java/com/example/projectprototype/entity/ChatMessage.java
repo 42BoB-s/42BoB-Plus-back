@@ -6,8 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "chatmessage")
@@ -27,11 +29,5 @@ public class ChatMessage extends TimeEntity {
     @Enumerated(EnumType.STRING)
     private MessageType messageType;
 
-    public void setRoom(Room room) {
-        if (this.room != null) {
-            this.room.getMessageList().remove(this);
-        }
-        this.room = room;
-        room.getMessageList().add(this);
-    }
+    private LocalDateTime time;
 }

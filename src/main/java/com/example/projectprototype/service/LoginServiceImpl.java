@@ -51,8 +51,7 @@ public class LoginServiceImpl implements LoginService{
             Object obj = parser.parse(response.getBody());
             JSONObject jsonObj = (JSONObject) obj;
             access_token = (String)jsonObj.get("access_token");
-        }catch (Exception e)
-        {
+        }catch (Exception e) {
             e.printStackTrace();
         }
         return access_token;
