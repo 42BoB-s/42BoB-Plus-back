@@ -1,6 +1,5 @@
 package com.example.projectprototype.interceptor;
 
-import com.example.projectprototype.dto.SessionDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.HandlerInterceptor;
 
