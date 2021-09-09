@@ -66,7 +66,24 @@ public class MyPageController {
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
         long result = userService.addBan(sessionDTO.getUserId(),userId);
-        resultMap.put("interCode", 1);
+        resultMap.put("interCode", (int) result);
+        entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+        return entity;
+    }
+
+    // 식사기록, stat
+    @DeleteMapping("/bobs/mypage/ban/{userId}")
+    private ResponseEntity<HashMap<String, Object>> deleteBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
+    {
+        // 벤리스트 등록
+        SessionDto sessionDTO = sessionCheck(req);
+        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
+            redirectLogin(resp);
+
+        ResponseEntity<HashMap<String, Object>> entity;
+        HashMap<String, Object> resultMap = new HashMap<>();
+        long result = userService.deleteBan(sessionDTO.getUserId(),userId);
+        resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }

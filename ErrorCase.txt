@@ -6,3 +6,4 @@ Long return 값
  -4 : 잘못된 enum 형 (ex : menus, location 이 형식에 맞지 않음)
  -5 : 권한 없음 (ex : 요청을 보낸 user 와 대상 room 간에 연관성 없음, owner 가 아닌데 title 을 바꾸려고 함)
  -6 : status error (ex : active 상태가 아닌 방에 참여하려고함)
+ -7 :
