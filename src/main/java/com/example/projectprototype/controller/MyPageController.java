@@ -1,6 +1,7 @@
 package com.example.projectprototype.controller;
 
 
+import com.example.projectprototype.dto.MealHistoryDto;
 import com.example.projectprototype.dto.SessionDto;
 import com.example.projectprototype.dto.StatDto;
 import com.example.projectprototype.repository.UserRepository;
@@ -44,6 +45,21 @@ public class MyPageController {
         return entity;
     }
 
+    @GetMapping("/bobs/mypage/mylog")
+    private ResponseEntity<HashMap<String, Object>> searchMyHistory()
+    {
+//        SessionDto sessionDTO = sessionCheck(req);
+//        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
+//            redirectLogin(resp);
+        ResponseEntity<HashMap<String, Object>> entity;
+        HashMap<String, Object> resultMap = new HashMap<>();
+        List<MealHistoryDto> mealHistoryDtoList= userRepository.searchHistory("mhong");
+        resultMap.put("interCode", 1);
+        resultMap.put("mealHistoryDtoList", mealHistoryDtoList);
+        entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+        return entity;
+    }
+
     @GetMapping("bobs/mypage/ban")
     private ResponseEntity<HashMap<String, Object>> searchBanList(HttpServletRequest req, HttpServletResponse resp)
     {
@@ -53,7 +69,7 @@ public class MyPageController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        List<String> banList = userService.searchBanList("mhong");
+        List<String> banList = userService.searchBanList(sessionDTO.getUserId());
         resultMap.put("interCode", 1);
         resultMap.put("List<String>", banList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
