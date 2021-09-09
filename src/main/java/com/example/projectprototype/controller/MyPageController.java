@@ -2,6 +2,8 @@ package com.example.projectprototype.controller;
 
 
 import com.example.projectprototype.dto.SessionDto;
+import com.example.projectprototype.dto.StatDto;
+import com.example.projectprototype.repository.UserRepository;
 import com.example.projectprototype.service.RoomService;
 import com.example.projectprototype.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,19 +27,22 @@ public class MyPageController {
     private String baseUrl;
 
     private final UserService userService;
-    // private final RoomService roomService;
+    private final UserRepository userRepository;
 
-//    @GetMapping("/bobs/mypage/stat")
-//    public void getStat(HttpServletRequest req, HttpServletResponse resp){
-//        SessionDto sessionDTO = sessionCheck(req);
-//        if (sessionDTO == null)
-//            redirectLogin(resp);
-//
-//        if (!userService.userIdCheck(sessionDTO.getUserId()))
-//            redirectLogin(resp);
-//
-//
-//    }
+    @GetMapping("/bobs/mypage/stat")
+    private ResponseEntity<HashMap<String, Object>> searchMyStat(HttpServletRequest req, HttpServletResponse resp)
+    {
+        SessionDto sessionDTO = sessionCheck(req);
+        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
+            redirectLogin(resp);
+        ResponseEntity<HashMap<String, Object>> entity;
+        HashMap<String, Object> resultMap = new HashMap<>();
+        StatDto stat = userRepository.searchStat(sessionDTO.getUserId()).get(0);
+        resultMap.put("interCode", 1);
+        resultMap.put("stat", stat);
+        entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+        return entity;
+    }
 
     @GetMapping("bobs/mypage/ban")
     private ResponseEntity<HashMap<String, Object>> searchBanList(HttpServletRequest req, HttpServletResponse resp)
@@ -48,7 +53,7 @@ public class MyPageController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        List<String> banList = userService.searchBanList(sessionDTO.getUserId());
+        List<String> banList = userService.searchBanList("mhong");
         resultMap.put("interCode", 1);
         resultMap.put("List<String>", banList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
@@ -58,7 +63,6 @@ public class MyPageController {
     @PatchMapping("/bobs/mypage/ban/{userId}")
     private ResponseEntity<HashMap<String, Object>> addBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
     {
-        // 벤리스트 등록
         SessionDto sessionDTO = sessionCheck(req);
         if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
             redirectLogin(resp);
@@ -71,11 +75,9 @@ public class MyPageController {
         return entity;
     }
 
-    // 식사기록, stat
     @DeleteMapping("/bobs/mypage/ban/{userId}")
     private ResponseEntity<HashMap<String, Object>> deleteBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
     {
-        // 벤리스트 등록
         SessionDto sessionDTO = sessionCheck(req);
         if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
             redirectLogin(resp);
@@ -96,16 +98,11 @@ public class MyPageController {
         }
     }
 
-
     public SessionDto sessionCheck(HttpServletRequest req) {
         HttpSession session = req.getSession(false);
         if (session == null) {
             return null;
         }
-        SessionDto sessionDTO = (SessionDto) session.getAttribute("session");
-        if (sessionDTO == null) {
-            return null;
-        }
-        return sessionDTO;
+        return (SessionDto)session.getAttribute("session");
     }
 }

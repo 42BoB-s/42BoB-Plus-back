@@ -1,5 +1,6 @@
 package com.example.projectprototype.entity;
 
+import com.example.projectprototype.dto.StatDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,32 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
+@NamedNativeQuery(
+        name = "searchStatQuery",
+        query = "select (select count(room_id) from participant where user_id = :id) as succeedStat, " +
+                " (select location FROM  (select * from participant where user_id = :id ) p" +
+                " left join room r on r.id = p.room_id" +
+                " group by location order by count(*) desc LIMIT 1) as locationStat," +
+                "(select m.name from (select * from participant where user_id = :id ) pp" +
+                " left join room_menu rm on rm.room_id=pp.room_id" +
+                " join menu m on rm.menu_id = m.id group by m.name order by count(*) desc LIMIT 1) as menusStat," +
+                "(select user_id from (select room_id from participant where user_id = :id) p1" +
+                " join (select * from participant where user_id != :id) p2 on p1.room_id = p2.room_id" +
+                " group by user_id order by count(*) desc limit 1) as name",
+        resultSetMapping = "StatDtoMapping"
+)
+@SqlResultSetMapping(
+        name = "StatDtoMapping",
+        classes = @ConstructorResult(
+                targetClass = StatDto.class,
+                columns = {
+                        @ColumnResult(name = "succeedStat",type = long.class),
+                        @ColumnResult(name = "locationStat",type = String.class),
+                        @ColumnResult(name = "menusStat",type = String.class),
+                        @ColumnResult(name = "name",type = String.class)
+                }
+        )
+)
 @Table(name = "user")
 public class User extends TimeEntity {
     @Id

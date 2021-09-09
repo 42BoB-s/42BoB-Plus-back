@@ -2,10 +2,10 @@ package com.example.projectprototype.service;
 
 import com.example.projectprototype.entity.Ban;
 import com.example.projectprototype.entity.User;
-import com.example.projectprototype.repository.BanRepository;
 import com.example.projectprototype.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class UserService {
     public long addBan(String src, String dest)
     {
         Optional<User> findSrc = userRepository.findById(src);
-        Optional<User> findDest = userRepository.findById(src);
+        Optional<User> findDest = userRepository.findById(dest);
 
         if (findDest.isEmpty())
             return -3L;
@@ -62,7 +62,7 @@ public class UserService {
     public long deleteBan(String src, String dest)
     {
         Optional<User> findSrc = userRepository.findById(src);
-        Optional<User> findDest = userRepository.findById(src);
+        Optional<User> findDest = userRepository.findById(dest);
 
         if (findDest.isEmpty())
             return -3L;
@@ -71,4 +71,6 @@ public class UserService {
         banService.deleteBan(findSrc.get(),findDest.get());
         return 1L;
     }
+
+
 }
