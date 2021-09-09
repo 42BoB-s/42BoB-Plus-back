@@ -38,7 +38,7 @@ public class ProfileImageServiceImpl implements ProfileImageService {
     }
 
     private Long typeCheck(MultipartFile file) {
-        List<String> allowedExt = Arrays.asList("png","jpg","jpeg","BMP");
+        List<String> allowedExt = Arrays.asList("png","jpg","jpeg","bmp","PNG","JPG","JPEG","BMP");
         String nameExt = extractNameExt(file.getOriginalFilename());
         String contentExt = extractContentExt(file.getContentType());
 
