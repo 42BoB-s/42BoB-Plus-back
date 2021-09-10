@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
@@ -14,10 +13,10 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findAll();
     List<Room> findByOwner(User user);
 
-    @Query(value = "update Room r set r.status = ?2 where r.id = ?1 ", nativeQuery = true)
+    @Query(value = "update room r set r.status = ?2 where r.id = ?1 ", nativeQuery = true)
     void updateStatus(Long id, String status);
 
-    @Query(value = "update Room r set r.title = ?2 where r.id = ?1", nativeQuery = true)
+    @Query(value = "update room r set r.title = ?2 where r.id = ?1", nativeQuery = true)
     void updateTitle(Long id, String title);
 
     @Query(value =
@@ -49,4 +48,21 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             ,nativeQuery = true)
     Page<Room> searchRooms(String location, String startTime, String endTime,
                            String keyword, String userId, List<String> menuNameList, Pageable pageable );
+
+    @Query(value = "SELECT DISTINCT r.id as 'distinct_id', r.* FROM " +
+            "(SELECT * FROM room WHERE status = 'actice' AND location LIKE ?1 " +
+            "AND meet_time BETWEEN ?2 AND ?3 AND title LIKE ?4) r " +
+            "JOIN room_menu rm ON r.id = rm.room_id " +
+            "JOIN menu m ON m.id = rm.menu_id " +
+            "WHERE m.name IN ?6 ",
+    countQuery =
+            "SELECT COUNT(DISTINCT r.id) FROM " +
+            "(SELECT * FROM room WHERE status = 'actice' AND location LIKE ?1 " +
+            "AND meet_time BETWEEN ?2 AND ?3 AND title LIKE ?4) r " +
+            "JOIN room_menu rm ON r.id = rm.room_id " +
+            "JOIN menu m ON m.id = rm.menu_id " +
+            "WHERE m.name IN ?6 ",
+    nativeQuery = true)
+    Page<Room> searchRooms(String location, String startTime, String endTime,
+                           String keyword, List<String> menuNameList, Pageable pageable);
 }
