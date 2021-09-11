@@ -1,5 +1,6 @@
 package com.example.projectprototype.mapper;
 
+import com.example.projectprototype.dto.SessionDto;
 import com.example.projectprototype.dto.UserDto;
 import com.example.projectprototype.entity.Ban;
 import com.example.projectprototype.entity.Room;
@@ -39,5 +40,14 @@ public interface UserMapper extends GenericMapper<UserDto, User> {
             userDto.getOwnedRoomList().add(room.getId());
         }
         return userDto;
+    }
+
+    default User convertToUser(SessionDto sessionDto) {
+        User user = new User();
+
+        user.setId(sessionDto.getUserId());
+        user.setProfile(sessionDto.getProfile());
+        user.setRole("1");
+        return user;
     }
 }

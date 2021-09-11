@@ -101,6 +101,22 @@ public class RoomServiceImpl implements RoomService {
         return roomDtoList;
     }
 
+    public List<RoomDto> searchRooms(SearchRoomsRequestDto reqDto, Pageable pageable) {
+        List<RoomDto> roomDtoList = new ArrayList<>();
+        // default 값 처리
+        utils.defaultValueProcess(reqDto);
+        // menu 값 처리
+        List<String> menuNameList = new ArrayList<>();
+        utils.getMenuName(reqDto.getMenu(), menuNameList);
+
+        Page<Room> roomPage = roomRepository.searchRooms(reqDto.getLocation(), reqDto.getStartTime(),
+                reqDto.getEndTime(), reqDto.getKeyword(), menuNameList, pageable);
+        // List<Dto> 변환
+        for (Room room : roomPage.getContent())
+            roomDtoList.add(roomMapper.convertToRoomDTO(room));
+        return roomDtoList;
+    }
+
     public Long enterRoom(String userId, String roomId) {
 
         // roomId parse 할 수 있는지
