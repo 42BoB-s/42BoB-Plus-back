@@ -1,11 +1,9 @@
 package com.example.projectprototype.controller;
 
-
 import com.example.projectprototype.dto.MealHistoryDto;
 import com.example.projectprototype.dto.SessionDto;
 import com.example.projectprototype.dto.StatDto;
 import com.example.projectprototype.repository.UserRepository;
-import com.example.projectprototype.service.RoomService;
 import com.example.projectprototype.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,11 +44,11 @@ public class MyPageController {
     }
 
     @GetMapping("/bobs/mypage/mylog")
-    private ResponseEntity<HashMap<String, Object>> searchMyHistory()
+    private ResponseEntity<HashMap<String, Object>> searchMyHistory(HttpServletRequest req, HttpServletResponse resp)
     {
-//        SessionDto sessionDTO = sessionCheck(req);
-//        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-//            redirectLogin(resp);
+        SessionDto sessionDTO = sessionCheck(req);
+        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
+            redirectLogin(resp);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
         List<MealHistoryDto> mealHistoryDtoList= userRepository.searchHistory("mhong");
