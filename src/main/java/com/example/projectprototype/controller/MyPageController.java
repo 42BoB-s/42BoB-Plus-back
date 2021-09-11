@@ -51,7 +51,7 @@ public class MyPageController {
             redirectLogin(resp);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        List<MealHistoryDto> mealHistoryDtoList= userRepository.searchHistory("mhong");
+        List<MealHistoryDto> mealHistoryDtoList= userRepository.searchHistory(sessionDTO.getUserId());
         resultMap.put("interCode", 1);
         resultMap.put("mealHistoryDtoList", mealHistoryDtoList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
