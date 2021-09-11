@@ -22,8 +22,7 @@ public class UserService {
 
     // userId 로 select 해서 결과값이 있으면 true, 없으면 false
     public boolean userIdCheck(String userId) {
-        Optional<User> user = userRepository.findById(userId);
-        return user.isPresent();
+        return userRepository.findById(userId).isPresent();
     }
 
     public List<String> searchBanList(String userId)

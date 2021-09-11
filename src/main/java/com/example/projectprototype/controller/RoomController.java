@@ -2,7 +2,6 @@ package com.example.projectprototype.controller;
 
 import com.example.projectprototype.dto.*;
 import com.example.projectprototype.service.RoomService;
-import com.example.projectprototype.service.RoomServiceImpl;
 import com.example.projectprototype.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,17 +30,11 @@ public class RoomController {
 
     // 방 생성
     @GetMapping("/room")
-    public ResponseEntity<HashMap<String, Object>> createRoom(RoomDto roomDTO,
-                                                              HttpServletRequest req, HttpServletResponse resp) {
-
-        // session 값이 있는지 확인, 없으면 login 화면으로 보내기.
-        // session 값이 있으면, 주어진 session 값에 id가 등록된 회원인지 확인
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
+    public ResponseEntity<HashMap<String, Object>> createRoom(HttpServletRequest req, RoomDto roomDTO) {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
+        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
 
         long result = roomService.createRoom(roomDTO, sessionDTO.getUserId());
 
@@ -56,15 +50,19 @@ public class RoomController {
 
     // 예약한 방 조회
     @GetMapping("/myroom")
-    public ResponseEntity<HashMap<String, Object>> searchMyRoom(HttpServletRequest req, HttpServletResponse resp) {
-
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
+    public ResponseEntity<HashMap<String, Object>> searchMyRoom(HttpServletRequest req) {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("session") == null) {
+            resultMap.put("interCode", 1);
+            resultMap.put("List<RoomDto>", null);
+            entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+            return entity;
+        }
 
+        SessionDto sessionDTO = (SessionDto) session.getAttribute("session");
         List<RoomDto> roomDtoList = roomService.searchMyRooms(sessionDTO.getUserId());
 
         resultMap.put("interCode", 1);
@@ -75,12 +73,8 @@ public class RoomController {
 
     // 필터링된 방 조회
     @GetMapping("/rooms")
-    public ResponseEntity<HashMap<String, Object>> searchRooms(HttpServletRequest req, HttpServletResponse resp,
+    public ResponseEntity<HashMap<String, Object>> searchRooms(HttpServletRequest req,
                                         Pageable pageable, SearchRoomsRequestDto reqDto) {
-
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
@@ -92,7 +86,16 @@ public class RoomController {
             return entity;
         }
 
-        List<RoomDto> roomDtoList = roomService.searchRooms(sessionDTO.getUserId(), reqDto, pageable);
+        List<RoomDto> roomDtoList;
+        HttpSession session = req.getSession(false);
+        if (req.getSession(false) == null || session.getAttribute("session") == null) {
+            roomDtoList = roomService.searchRooms(reqDto, pageable);
+        }
+        else {
+            SessionDto sessionDTO = (SessionDto) session.getAttribute("session");
+            roomDtoList = roomService.searchRooms(sessionDTO.getUserId(), reqDto, pageable);
+        }
+
         resultMap.put("interCode", 1);
         resultMap.put("List<RoomDto>", roomDtoList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
@@ -100,15 +103,12 @@ public class RoomController {
     }
 
     @PatchMapping("/room/enter/{roomid}")
-    public ResponseEntity<HashMap<String, Object>> enterRoom(HttpServletRequest req, HttpServletResponse resp,
+    public ResponseEntity<HashMap<String, Object>> enterRoom(HttpServletRequest req,
                                        @PathVariable String roomid){
-
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
+        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
 
         long result = roomService.enterRoom(sessionDTO.getUserId(), roomid);
         if (result < 0L)
@@ -120,15 +120,12 @@ public class RoomController {
     }
 
     @DeleteMapping("/room/exit/{roomid}")
-    public ResponseEntity<HashMap<String, Object>> exitRoom(HttpServletRequest req, HttpServletResponse resp,
+    public ResponseEntity<HashMap<String, Object>> exitRoom(HttpServletRequest req,
                                 @PathVariable String roomid) {
-
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
+        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
 
         long result = roomService.exitRoom(sessionDTO.getUserId(), roomid);
         if (result < 0L)
@@ -140,15 +137,13 @@ public class RoomController {
     }
 
     @PutMapping("room/title/{roomid}")
-    public ResponseEntity<HashMap<String, Object>> updateTitle(HttpServletRequest req, HttpServletResponse resp,
+    public ResponseEntity<HashMap<String, Object>> updateTitle(HttpServletRequest req,
                                                                 @RequestBody UpdateTitleRequestDto titleDto,
                                                                 @PathVariable String roomid) {
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
+        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
 
         long result = roomService.updateTitle(titleDto.getTitle(), roomid, sessionDTO.getUserId());
 
@@ -160,19 +155,5 @@ public class RoomController {
         return entity;
     }
 
-    private void redirectLogin(HttpServletResponse resp) {
-        try {
-            resp.sendRedirect(baseUrl + "login");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public SessionDto sessionCheck(HttpServletRequest req) {
-        HttpSession session = req.getSession(false);
-        if (session == null) {
-            return null;
-        }
-        return (SessionDto)session.getAttribute("session");
-    }
 }
