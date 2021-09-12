@@ -36,7 +36,7 @@ public class UserService {
         return banDestNames;
     }
 
-    public boolean checkBanList(User src, User dest)
+    private boolean checkBanList(User src, User dest)
     {
         for (Ban ban : src.getBanSrcList()){
             if (ban.getDest() == dest)

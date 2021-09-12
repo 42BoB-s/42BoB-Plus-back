@@ -22,9 +22,6 @@ public class BanService {
         ban.setSrc(src);
         ban.setDest(dest);
         banRepository.save(ban);
-
-        src.addBanSrc(ban);
-        dest.addBanDest(ban);
     }
 
     public void deleteBan(User src, User dest)
