@@ -13,6 +13,10 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, String> {
 
+   @Query(value = "UPDATE user u SET u.profile = ?1 WHERE u.id = ?2 ",
+            nativeQuery = true)
+    void updateProfilePath(String path, String userId);
+  
     @Query(name = "searchStatQuery", nativeQuery = true)
     List<StatDto> searchStat(@Param("id") String id);
 
