@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProfileImageServiceImpl implements ProfileImageService {
 
-    @Value("${image.dir}")
+    @Value("${profile.image.dir}")
     private String imgDir;
     private final UserRepository userRepository;
 
