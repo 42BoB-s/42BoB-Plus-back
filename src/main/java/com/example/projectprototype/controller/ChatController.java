@@ -1,28 +1,28 @@
 package com.example.projectprototype.controller;
 
-import com.example.projectprototype.repository.ChatMessageRepository;
-import com.example.projectprototype.service.ChatServiceImpl;
+import com.example.projectprototype.dto.SessionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ChatController {
-	private final ChatMessageRepository chatRoomRepository;
-	private final ChatServiceImpl chatService;
 
-	//@GetMapping("/rooms/{id}")
-	@GetMapping("/rooms") // 테스트 용 (추후 위와 같이 수정 필요 + 세션)
-	public String chatRoom(@RequestParam Long room_id, @RequestParam String writer, Model model){
-		// http://localhost:8080/rooms?room_id=78&writer=user1
-
-		//예정
-		//ResponseDto -> ResponseEntity 변경
-		return "room";
+	@GetMapping("/bobs/chat/{roomId}")
+	public ModelAndView chat(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp, @PathVariable("roomId") int roomId) {
+		SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
+		modelAndView.addObject("room_id", roomId);
+		modelAndView.addObject("writer", sessionDTO.getUserId());
+		//modelAndView.setViewName("room"); // 임시
+		modelAndView.setViewName("chat");
+		return modelAndView;
 	}
 }

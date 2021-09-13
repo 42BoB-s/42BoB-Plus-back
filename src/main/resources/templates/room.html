@@ -14,72 +14,74 @@
 
 </head>
 <body>
-    <br>
-    <div id = "chatroom" style = "width:500px; height: 700px; border:1px solid"></div>
-    <input type = "text" id = "message" style = "height : 30px; width : 340px" placeholder="내용을 입력하세요" autofocus>
-    <button class = "btn btn-primary" id = "send">전송</button>
-    <button class = "btn btn-primary" id = "exit">나가기</button>
-    <script th:inline = "javascript">
-        var webSocket;
-        var userid = getParameterByName('writer'); // 세션에서 받아와야함 (현재는 임시)
-        var roomId = parseInt(getParameterByName('room_id'));
-        connect();
-        document.getElementById("send").addEventListener("click",function(){
-            send();
-        })
-        connect();
-        document.getElementById("exit").addEventListener("click",function(){
-            disconnect();
-        })
-        function connect(){
-            webSocket = new WebSocket("ws://localhost:8080/bobs/chat");
-            webSocket.onopen = onOpen;
-            webSocket.onclose = onClose;
-            webSocket.onmessage = onMessage;
-            console.log('connect run');
-        }
-        function disconnect(){
-            webSocket.send(JSON.stringify({room_id : roomId, messageType:'leave', writer: userid}));
-            webSocket.close();
-            console.log('disconnect run');
-        }
-        function send(){
-            msg = document.getElementById("message").value;
-            webSocket.send(JSON.stringify({room_id : roomId, messageType:'text', writer: userid, message : msg}));
-            document.getElementById("message").value = "";
-            console.log('send run');
-        }
-        function onOpen(){
-            webSocket.send(JSON.stringify({room_id : roomId, messageType:'enter', writer:userid}));
-            console.log('onOpen run');
-        }
-        function onMessage(e){
-            var message = JSON.parse(e.data);
-            //에러 코드에 관해선 노션 참고!!
-            if (message.interCode)
-                alert(message.interCode);
-            else {
-                message = JSON.parse(message);
-                chatroom = document.getElementById("chatroom");
-                for(idx in message)
-                {
-                    if (message[idx].writer != NaN)
-                        chatroom.innerHTML += message[idx].writer + " : ";
-                    chatroom.innerHTML += message[idx].message;
-                    chatroom.innerHTML += " (" + message[idx].time + ")";
-                    chatroom.innerHTML += "<br>";
-                }
-                console.log('onMessage run');
+<br>
+<div id = "chatroom" style = "width:500px; height: 700px; border:1px solid"></div>
+<input type = "text" id = "message" style = "height : 30px; width : 340px" placeholder="내용을 입력하세요" autofocus>
+<button class = "btn btn-primary" id = "send">전송</button>
+<button class = "btn btn-primary" id = "exit">나가기</button>
+<script th:inline = "javascript">
+    var webSocket;
+    /*<![CDATA[*/
+    var userid = [[${writer}]];
+    var roomId = [[${room_id}]];
+    /*]]>*/
+    connect();
+    document.getElementById("send").addEventListener("click",function(){
+        send();
+    })
+    document.getElementById("exit").addEventListener("click",function(){
+        disconnect();
+    })
+    function connect(){
+        webSocket = new WebSocket("ws://leeworld9.ipdisk.co.kr:58080/bobs/chat");
+        webSocket.onopen = onOpen;
+        webSocket.onclose = onClose;
+        webSocket.onmessage = onMessage;
+        console.log('connect run');
+    }
+    function disconnect(){
+        webSocket.send(JSON.stringify({room_id : roomId, messageType:'leave', writer: userid}));
+        webSocket.close();
+        console.log('disconnect run');
+    }
+    function send(){
+        msg = document.getElementById("message").value;
+        webSocket.send(JSON.stringify({room_id : roomId, messageType:'text', writer: userid, message : msg}));
+        document.getElementById("message").value = "";
+        console.log('send run');
+    }
+    function onOpen(){
+        webSocket.send(JSON.stringify({room_id : roomId, messageType:'enter', writer:userid}));
+        console.log('onOpen run');
+    }
+    function onMessage(e){
+        var message = JSON.parse(e.data);
+        //에러 코드에 관해선 노션 참고!!
+        if (message.interCode)
+            alert(message.interCode);
+        else {
+            console.log(message);
+            message = JSON.parse(message);
+            chatroom = document.getElementById("chatroom");
+            for(idx in message)
+            {
+                if (message[idx].writer != NaN)
+                    chatroom.innerHTML += message[idx].writer + " : ";
+                chatroom.innerHTML += message[idx].message;
+                chatroom.innerHTML += " (" + message[idx].time + ")";
+                chatroom.innerHTML += "<br>";
             }
+            console.log('onMessage run');
         }
-        function onClose(){
-            disconnect();
-        }
-        function getParameterByName(name) {
-            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(location.search);
-            return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-        }
-    </script>
+    }
+    function onClose(){
+        disconnect();
+    }
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+</script>
 </body>
 </html>
