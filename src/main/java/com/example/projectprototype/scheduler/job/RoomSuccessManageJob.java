@@ -5,6 +5,8 @@ import com.example.projectprototype.entity.enums.RoomStatus;
 import com.example.projectprototype.repository.RoomRepository;
 import com.example.projectprototype.service.ChatService;
 import com.example.projectprototype.service.ChatServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.quartz.*;
 
 import java.time.LocalDateTime;
@@ -15,12 +17,15 @@ public class RoomSuccessManageJob implements Job{
 
     private final RoomRepository roomRepository;
     private final ChatService chatService;
+    private final ObjectMapper objectMapper;
 
-    RoomSuccessManageJob(RoomRepository roomRepository, ChatServiceImpl chatService) {
+    RoomSuccessManageJob(RoomRepository roomRepository, ChatServiceImpl chatService, ObjectMapper objectMapper) {
         this.roomRepository = roomRepository;
         this.chatService = chatService;
+        this.objectMapper = objectMapper;
     }
 
+    @SneakyThrows
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         LocalDateTime fromTime = LocalDateTime.now();
@@ -30,6 +35,7 @@ public class RoomSuccessManageJob implements Job{
         if (rooms.size() > 0) {
             for (Room room : rooms) {
                 roomRepository.updateStatus(room.getId(), "succeed"); // active 상태 방을 탐색하면서 조건에 맞으면 success 상태로 바꾸기
+                chatService.succeedSend(room.getId(), objectMapper); // 약속이 성사되었다는 메시지를 보냄.
                 chatService.removeChat(room.getId()); // 해당 roomId key value 에 해당하는 메모리 영역 remove
             }
         }
