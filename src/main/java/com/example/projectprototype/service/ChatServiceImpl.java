@@ -155,4 +155,16 @@ public class ChatServiceImpl implements ChatService{
 		}
 		*/
 	}
+
+	public void removeChat(Long roomId) {
+		try {
+			// 갈비지 컬랙터가 처리하기 전에 직접 내용물을 지워줌으로써 힙 영역 용량 확보
+			if (map.get(roomId).size() > 0)
+				map.get(roomId).clear();
+			map.remove(roomId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// error 로깅
+		}
+	}
 }

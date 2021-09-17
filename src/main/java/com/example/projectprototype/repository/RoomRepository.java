@@ -2,16 +2,21 @@ package com.example.projectprototype.repository;
 
 import com.example.projectprototype.entity.Room;
 import com.example.projectprototype.entity.User;
+import com.example.projectprototype.entity.enums.RoomStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     List<Room> findAll();
     List<Room> findByOwner(User user);
+    List<Room> findByStatus(RoomStatus status);
+    List<Room> findByStatusAndMeetTimeBetween(RoomStatus roomStatus, LocalDateTime fromDate, LocalDateTime toDate);
 
     @Query(value = "update room r set r.status = ?2 where r.id = ?1 ", nativeQuery = true)
     void updateStatus(Long id, String status);
