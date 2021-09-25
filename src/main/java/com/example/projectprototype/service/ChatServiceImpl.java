@@ -155,4 +155,32 @@ public class ChatServiceImpl implements ChatService{
 		}
 		*/
 	}
+
+	public void succeedSend(Long roomId, ObjectMapper objectMapper) throws IOException {
+		JSONArray jsonArray = new JSONArray();
+
+		ChatMessageDto chatMessageDto = new ChatMessageDto();
+		chatMessageDto.setWriter("Admin");
+		chatMessageDto.setMessageType(MessageType.text);
+		chatMessageDto.setMessage("약속 시간이 되었습니다. 약속장소에서 만나요!");
+		chatMessageDto.setTime(LocalDateTime.now());
+
+		jsonArray.put(new JSONObject(objToJson(chatMessageDto, objectMapper)));
+		for (Map.Entry<String, WebSocketSession> userSession : (map.get(roomId).entrySet())) {
+				TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(jsonArray.toString()));
+				userSession.getValue().sendMessage(textMessage);
+			}
+		}
+
+	public void removeChat(Long roomId) {
+		try {
+			// 갈비지 컬랙터가 처리하기 전에 직접 내용물을 지워줌으로써 힙 영역 용량 확보
+			if (map.get(roomId).size() > 0)
+				map.get(roomId).clear();
+			map.remove(roomId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// error 로깅
+		}
+	}
 }

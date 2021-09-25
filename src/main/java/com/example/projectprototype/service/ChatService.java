@@ -16,4 +16,6 @@ public interface ChatService {
 	JSONArray loadHistory(ChatMessageDto chatMessageDto, ObjectMapper objectMapper, JSONArray jsonArray) throws IOException;
 	String objToJson(ChatMessageDto chatMessageDto, ObjectMapper objectMapper) throws IOException;
 	void send(WebSocketSession session, ChatMessageDto chatMessageDto, ObjectMapper objectMapper, JSONArray jsonArray) throws IOException;
+	void removeChat(Long roomId);
+	void succeedSend(Long roomId, ObjectMapper objectMapper) throws IOException;
 }
