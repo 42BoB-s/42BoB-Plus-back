@@ -6,7 +6,7 @@ import com.bobPlus.dto.SessionDto;
 import com.bobPlus.dto.UpdateTitleRequestDto;
 import com.bobPlus.service.RoomService;
 import com.bobPlus.service.UserService;
-import com.example.projectprototype.dto.*;
+import com.bobPlus.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
