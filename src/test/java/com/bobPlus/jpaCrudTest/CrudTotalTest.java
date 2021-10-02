@@ -175,7 +175,7 @@ public class CrudTotalTest {
                         .isEqualTo(MenuName.중식);
 
         Assertions.assertThat(room2.get().getRoomMenuList().get(1).getMenu().getName())
-                .isEqualTo(MenuName.중식);
+                .isEqualTo(MenuName.커피);
     }
 
     @Test

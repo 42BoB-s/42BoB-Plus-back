@@ -43,7 +43,7 @@ public class RoomServiceImplTotalTest {
         userRepository.save(user1);
 
         List<String> menuList = new ArrayList<>();
-        menuList.add("중식"); menuList.add("한식");menuList.add("커피");
+        menuList.add("중식"); menuList.add("한식");
         setTestRoom(user1,"서초", "title1", "notice1",
                "2021-09-04 12:00:00", menuList);
 

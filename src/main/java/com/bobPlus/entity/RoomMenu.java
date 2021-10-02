@@ -28,7 +28,6 @@ public class RoomMenu extends TimeEntity {
             this.room.getRoomMenuList().remove(this);
         }
         this.room = room;
-        this.room.getRoomMenuList().add(this);
     }
 
     public void setMenu(Menu menu) {
