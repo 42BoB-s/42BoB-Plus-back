@@ -6,8 +6,6 @@ import com.bobPlus.entity.enums.MenuName;
 import com.bobPlus.entity.enums.MessageType;
 import com.bobPlus.entity.enums.RoomStatus;
 import com.bobPlus.repository.*;
-import com.example.projectprototype.entity.*;
-import com.example.projectprototype.repository.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
