@@ -16,7 +16,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .order(1)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/login", "/logout", "/", "/42OAuth",
-                        "/rooms", "/myroom", "/header",
+                        "bobs/rooms", "bobs/myroom", "bobs/header",
                         "/css/**", "/*.ico", "/error");
     }
 }
