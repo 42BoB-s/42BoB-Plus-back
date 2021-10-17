@@ -19,13 +19,14 @@ public class RoomServiceUtils {
     public final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public void defaultValueProcess(SearchRoomsRequestDto reqDto) {
-
-        if (reqDto.getKeyword().equals("default")) reqDto.setKeyword("%");
+        if (reqDto.getKeyword().equals("default"))
+                reqDto.setKeyword("%");
         else {
             String tmp = reqDto.getKeyword();
             reqDto.setKeyword("%" + tmp + "%");
         }
-        if (reqDto.getLocation().equals("default")) reqDto.setLocation("%");
+        if (reqDto.getLocation().equals("default"))
+                reqDto.setLocation("%");
         if (reqDto.getStartTime().equals("default") || reqDto.getEndTime().equals("default")) {
             reqDto.setStartTime(LocalDateTime.now().minusMinutes(30).format(formatter));
             reqDto.setEndTime(LocalDateTime.now().plusHours(25).format(formatter));
