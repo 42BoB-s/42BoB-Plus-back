@@ -5,9 +5,7 @@ import com.bobPlus.mapper.RoomMapper;
 import com.bobPlus.repository.RoomRepository;
 import com.bobPlus.dto.RoomDto;
 import com.bobPlus.dto.SearchRoomsRequestDto;
-import com.bobPlus.entity.*;
 import com.bobPlus.entity.enums.RoomStatus;
-import com.bobPlus.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,16 +15,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-/** Long return 값
- * 양수 생성된 방의 id
- * -1 : parse error (ex : 입력된 시간의 형태가 형식에 맞지 않음)
- * -2 : 잘못된 시간 (ex : + 1시간 이내에 유저가 방에 참여하려고함)
- * -3 : 잘못된 DB 조회 (ex : userId 가 DB에 등록되지 않은 id , roomId 가 DB에 등록되지 않은 id)
- * -4 : 잘못된 enum 형 (ex : menus, location 이 형식에 맞지 않음)
- * -5 : 권한 없음 (ex : 요청을 보낸 user 와 대상 room 간에 연관성 없음, owner 가 아닌데 title 을 바꾸려고 함)
- * -6 : status error (ex : active 상태가 아닌 방에 참여하려고함)
- */
 
 @Service
 @Transactional
@@ -187,14 +175,18 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public Long paramsCheck(SearchRoomsRequestDto reqDto) {
-        if (!utils.isInLocation(reqDto.getLocation()))
+        try {
+            if (!utils.isInLocation(reqDto.getLocation()))
+                return -4L;
+            if (!utils.isInMenuName(reqDto.getMenu()))
+                return -4L;
+            if (!utils.isTimeFormat(reqDto.getStartTime()))
+                return -1L;
+            if (!utils.isTimeFormat(reqDto.getEndTime()))
+                return -1L;
+        } catch (NullPointerException e) {
             return -4L;
-        if (!utils.isInMenuName(reqDto.getMenu()))
-            return -4L;
-        if (!utils.isTimeFormat(reqDto.getStartTime()))
-            return -1L;
-        if (!utils.isTimeFormat(reqDto.getEndTime()))
-            return -1L;
+        }
         return 0L;
     }
 }

@@ -6,7 +6,6 @@ import com.bobPlus.dto.SessionDto;
 import com.bobPlus.dto.UpdateTitleRequestDto;
 import com.bobPlus.service.RoomService;
 import com.bobPlus.service.UserService;
-import com.bobPlus.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 

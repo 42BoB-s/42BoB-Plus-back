@@ -59,14 +59,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "AND meet_time BETWEEN ?2 AND ?3 AND title LIKE ?4) r " +
             "JOIN room_menu rm ON r.id = rm.room_id " +
             "JOIN menu m ON m.id = rm.menu_id " +
-            "WHERE m.name IN ?6 ",
+            "WHERE m.name IN ?5 ",
     countQuery =
             "SELECT COUNT(DISTINCT r.id) FROM " +
             "(SELECT * FROM room WHERE status = 'actice' AND location LIKE ?1 " +
             "AND meet_time BETWEEN ?2 AND ?3 AND title LIKE ?4) r " +
             "JOIN room_menu rm ON r.id = rm.room_id " +
             "JOIN menu m ON m.id = rm.menu_id " +
-            "WHERE m.name IN ?6 ",
+            "WHERE m.name IN ?5 ",
     nativeQuery = true)
     Page<Room> searchRooms(String location, String startTime, String endTime,
                            String keyword, List<String> menuNameList, Pageable pageable);
