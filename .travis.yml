@@ -52,4 +52,4 @@ before_install:
 - mv application.properties src/main/resources
 - ls src/main/resources/
 - cat src/main/resources/application.properties
-
+- chmod 777 ./gradlew
