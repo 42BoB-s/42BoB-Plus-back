@@ -54,7 +54,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Page<Room> searchRooms(String location, String startTime, String endTime,
                            String keyword, String userId, List<String> menuNameList, Pageable pageable );
 
-    @Query(value = "SELECT DISTINCT r.id as 'distinct_id', r.* FROM " +
+    @Query(value = "SELECT DISTINCT r.id as  'distinct_id', r.* FROM " +
             "(SELECT * FROM room WHERE status = 'active' AND location LIKE ?1 " +
             "AND meet_time BETWEEN ?2 AND ?3 AND title LIKE ?4) r " +
             "JOIN room_menu rm ON r.id = rm.room_id " +
