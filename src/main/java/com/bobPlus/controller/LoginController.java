@@ -23,18 +23,14 @@ public class LoginController {
     private String baseUrl;
 
     @GetMapping("/42OAuth")
-    public void OAuth(HttpServletRequest req, HttpServletResponse resp,
+    public String OAuth(HttpServletRequest req, HttpServletResponse resp,
                       @RequestParam(value = "code") String code) {
         String token = loginService.getOAuthToken(code);
         SessionDto sessionDto = loginService.getUserInfo(token);
         loginService.processNewUser(sessionDto);
         //임시
         HttpSession httpSession = loginService.getSession(req, sessionDto);
-        try {
-            resp.sendRedirect(baseUrl + "main");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return "redirect:https://42bobs.netlify.app";
     }
 
     @GetMapping("/login")
