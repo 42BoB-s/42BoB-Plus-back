@@ -50,6 +50,7 @@ public class DebugRoomService {
         roomDTO.setTitle(titleList.get(rand.nextInt(titleList.size())));
         roomDTO.setMeetTime(LocalDateTime.now().format(formatter));
         roomDTO.setStatus("active");
+        roomDTO.setAnnouncement("Announcement");
         List<String> chosenMenu = new ArrayList<>();
         chosenMenu.add(menuList.get(rand.nextInt(menuList.size())));
         roomDTO.setMenus(chosenMenu);
