@@ -34,6 +34,7 @@ public class DebugRoomService {
 
     public Long debug_createRoomRandom(RoomDto roomDTO) {
         Random rand = new Random();
+        LocalDateTime now = LocalDateTime.now();
         String userId = idList.get(rand.nextInt(idList.size()));
 
         if (!userService.userIdCheck(userId)) {
@@ -48,7 +49,7 @@ public class DebugRoomService {
         roomDTO.setLocation("서초");
         roomDTO.setCapacity(4);
         roomDTO.setTitle(titleList.get(rand.nextInt(titleList.size())));
-        roomDTO.setMeetTime(LocalDateTime.now().format(formatter));
+        roomDTO.setMeetTime(now.format(formatter));
         roomDTO.setStatus("active");
         roomDTO.setAnnouncement("Announcement");
         List<String> chosenMenu = new ArrayList<>();
