@@ -57,7 +57,7 @@ public class RoomController {
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("session") == null) {
             resultMap.put("interCode", 1);
-            resultMap.put("List<RoomDto>", null);
+            resultMap.put("roomList", null);
             entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
             return entity;
         }
@@ -66,7 +66,7 @@ public class RoomController {
         List<RoomDto> roomDtoList = roomService.searchMyRooms(sessionDTO.getUserId());
 
         resultMap.put("interCode", 1);
-        resultMap.put("List<RoomDto>", roomDtoList);
+        resultMap.put("roomList", roomDtoList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }
@@ -97,7 +97,7 @@ public class RoomController {
         }
 
         resultMap.put("interCode", 1);
-        resultMap.put("List<RoomDto>", roomDtoList);
+        resultMap.put("roomList", roomDtoList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }
