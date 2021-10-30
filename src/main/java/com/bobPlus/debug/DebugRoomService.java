@@ -39,6 +39,7 @@ public class DebugRoomService {
         if (!userService.userIdCheck(userId)) {
             UserDto userDto = new UserDto();
             userDto.setId(userId);
+            userDto.setProfile(userId + ".jpg");
             User user = userMapper.toEntity(userDto);
             userRepository.save(user);
         }
@@ -59,6 +60,7 @@ public class DebugRoomService {
         if (!userService.userIdCheck(userId)) {
             UserDto userDto = new UserDto();
             userDto.setId(userId);
+            userDto.setProfile(userId + ".jpg");
             User user = userMapper.toEntity(userDto);
             userRepository.save(user);
         }
