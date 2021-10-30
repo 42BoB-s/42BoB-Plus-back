@@ -41,6 +41,7 @@ public class DebugRoomService {
             userDto.setId(userId);
             userDto.setProfile(userId + ".jpg");
             User user = userMapper.toEntity(userDto);
+            user.setRole("1");
             userRepository.save(user);
         }
 
@@ -62,6 +63,7 @@ public class DebugRoomService {
             userDto.setId(userId);
             userDto.setProfile(userId + ".jpg");
             User user = userMapper.toEntity(userDto);
+            user.setRole("1");
             userRepository.save(user);
         }
 
