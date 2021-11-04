@@ -1,4 +1,4 @@
-package com.bobPlus;
+package com.bobsPlus;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
