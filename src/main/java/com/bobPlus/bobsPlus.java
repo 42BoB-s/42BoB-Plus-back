@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 
 @SpringBootApplication
-public class ProjectProtoTypeApplication {
+public class bobsPlus {
 
     public static void main(String[] args) {
-        SpringApplication.run(ProjectProtoTypeApplication.class, args);
+        SpringApplication.run(bobsPlus.class, args);
     }
     
 	private Connector httpToHttpsRedirectConnector() {
