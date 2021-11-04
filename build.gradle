@@ -9,8 +9,6 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
-    archivesBaseName = 'bobsPlus'
-    archiveFileName = 'bobsPlus.jar'
     compileOnly {
         extendsFrom annotationProcessor
     }
