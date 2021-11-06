@@ -1,8 +1,9 @@
+#codedeploy를 위한 문서입니다.
 version: 0.0
 os: linux
 files:
         - source: /
-          destination: /home/ubuntu/app/step2/zip/
+          destination: /home/ubuntu/deploy/zip/
           overwrite: yes
 permissions: 
  - object: /
