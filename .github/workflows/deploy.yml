@@ -24,3 +24,31 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle without test
       run: ./gradlew build --exclude-task test
+    - name: Upload S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_S3_UPLOAD }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_S3_UPLOAD_KEY }}
+      run: |
+        aws s3 cp \
+          --region ap-northeast-2 \
+          ./build/libs/*.jar s3://bobsplus-build
+        
+    - name: Make zip file #1
+      run: zip -qq -r ./$GITHUB_SHA.zip .
+      shell: bash
+
+    - name: Configure AWS credentials #2
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_S3_UPLOAD }}
+        aws-secret-access-key: ${{ secrets.AWS_S3_UPLOAD_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Upload to S3 #3
+      run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://{저장할 폴더}/$GITHUB_SHA.zip
+
+    - name: Code Deploy #4
+      run: aws deploy create-deployment --application-name bobsPlus
+        --deployment-config-name CodeDeployDefault.OneAtATime
+        --deployment-group-name bobsPlus-group
+        --s3-location bucket=bobsplus-build,bundleType=zip,key=$GITHUB_SHA.zip
