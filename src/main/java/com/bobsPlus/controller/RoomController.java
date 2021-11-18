@@ -155,5 +155,14 @@ public class RoomController {
         return entity;
     }
 
-
+    @GetMapping("/menus")
+    public ResponseEntity<HashMap<String, Object>> searchRooms() {
+        ResponseEntity<HashMap<String, Object>> entity;
+        HashMap<String, Object> resultMap = new HashMap<>();
+        List<String> menus = Stream.of(MenuName.values()).map(Enum::name).collect(Collectors.toList());
+        resultMap.put("interCode", 1);
+        resultMap.put("menuList", menus);
+        entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+        return entity;
+    }
 }
