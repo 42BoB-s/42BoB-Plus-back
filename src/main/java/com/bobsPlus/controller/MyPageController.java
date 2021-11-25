@@ -17,7 +17,10 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 public class MyPageController {
