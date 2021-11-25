@@ -156,7 +156,7 @@ public class RoomController {
         resultMap.put("interCode", (int) result);
         return entity;
     }
-
+/*
     @GetMapping("/menus")
     public ResponseEntity<HashMap<String, Object>> searchRooms() {
         ResponseEntity<HashMap<String, Object>> entity;
@@ -167,4 +167,5 @@ public class RoomController {
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }
+    */
 }
