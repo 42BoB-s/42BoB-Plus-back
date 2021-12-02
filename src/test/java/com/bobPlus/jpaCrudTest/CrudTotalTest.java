@@ -1,11 +1,11 @@
-package com.bobPlus.jpaCrudTest;
+package com.bobsPlus.jpaCrudTest;
 
-import com.bobPlus.entity.*;
-import com.bobPlus.entity.enums.Location;
-import com.bobPlus.entity.enums.MenuName;
-import com.bobPlus.entity.enums.MessageType;
-import com.bobPlus.entity.enums.RoomStatus;
-import com.bobPlus.repository.*;
+import com.bobsPlus.entity.*;
+import com.bobsPlus.entity.enums.Location;
+import com.bobsPlus.entity.enums.MenuName;
+import com.bobsPlus.entity.enums.MessageType;
+import com.bobsPlus.entity.enums.RoomStatus;
+import com.bobsPlus.repository.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

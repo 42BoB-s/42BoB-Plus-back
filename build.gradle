@@ -38,6 +38,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.12.3'
+    implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.2'
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.5.3'
     implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '5.5.1'
