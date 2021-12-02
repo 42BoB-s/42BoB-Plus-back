@@ -1,8 +1,9 @@
 package com.bobPlus.controller;
 
+import com.bobPlus.dto.UserDto;
+import com.bobPlus.service.TokenService;
 import com.bobPlus.service.UserService;
 import com.bobPlus.dto.MealHistoryDto;
-import com.bobPlus.dto.SessionDto;
 import com.bobPlus.dto.StatDto;
 import com.bobPlus.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +28,15 @@ public class MyPageController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+    private final TokenService tokenService;
 
     @GetMapping("/bobs/mypage/stat")
     private ResponseEntity<HashMap<String, Object>> searchMyStat(HttpServletRequest req, HttpServletResponse resp)
     {
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
+        UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        StatDto stat = userRepository.searchStat(sessionDTO.getUserId()).get(0);
+        StatDto stat = userRepository.searchStat(userDto.getId()).get(0);
         resultMap.put("interCode", 1);
         resultMap.put("stat", stat);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
@@ -46,12 +46,10 @@ public class MyPageController {
     @GetMapping("/bobs/mypage/mylog")
     private ResponseEntity<HashMap<String, Object>> searchMyHistory(HttpServletRequest req, HttpServletResponse resp)
     {
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
+        UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        List<MealHistoryDto> mealHistoryDtoList= userRepository.searchHistory(sessionDTO.getUserId());
+        List<MealHistoryDto> mealHistoryDtoList= userRepository.searchHistory(userDto.getId());
         resultMap.put("interCode", 1);
         resultMap.put("mealHistoryDtoList", mealHistoryDtoList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
@@ -61,13 +59,10 @@ public class MyPageController {
     @GetMapping("bobs/mypage/ban")
     private ResponseEntity<HashMap<String, Object>> searchBanList(HttpServletRequest req, HttpServletResponse resp)
     {
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
-
+        UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        List<String> banList = userService.searchBanList(sessionDTO.getUserId());
+        List<String> banList = userService.searchBanList(userDto.getId());
         resultMap.put("interCode", 1);
         resultMap.put("List<String>", banList);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
@@ -77,13 +72,10 @@ public class MyPageController {
     @PatchMapping("/bobs/mypage/ban/{userId}")
     private ResponseEntity<HashMap<String, Object>> addBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
     {
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
-
+        UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        long result = userService.addBan(sessionDTO.getUserId(),userId);
+        long result = userService.addBan(userDto.getId(),userId);
         resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
@@ -92,31 +84,13 @@ public class MyPageController {
     @DeleteMapping("/bobs/mypage/ban/{userId}")
     private ResponseEntity<HashMap<String, Object>> deleteBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
     {
-        SessionDto sessionDTO = sessionCheck(req);
-        if (sessionDTO == null || !userService.userIdCheck(sessionDTO.getUserId()))
-            redirectLogin(resp);
-
+        UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        long result = userService.deleteBan(sessionDTO.getUserId(),userId);
+        long result = userService.deleteBan(userDto.getId(),userId);
         resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }
 
-    private void redirectLogin(HttpServletResponse resp) {
-        try {
-            resp.sendRedirect(baseUrl + "login");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public SessionDto sessionCheck(HttpServletRequest req) {
-        HttpSession session = req.getSession(false);
-        if (session == null) {
-            return null;
-        }
-        return (SessionDto)session.getAttribute("session");
-    }
 }

@@ -1,6 +1,5 @@
 package com.bobPlus.mapper;
 
-import com.bobPlus.dto.SessionDto;
 import com.bobPlus.dto.UserDto;
 import com.bobPlus.entity.Ban;
 import com.bobPlus.entity.Room;
@@ -42,11 +41,11 @@ public interface UserMapper extends GenericMapper<UserDto, User> {
         return userDto;
     }
 
-    default User convertToUser(SessionDto sessionDto) {
+    default User convertToUser(UserDto userDto) {
         User user = new User();
 
-        user.setId(sessionDto.getUserId());
-        user.setProfile(sessionDto.getProfile());
+        user.setId(userDto.getId());
+        user.setProfile(userDto.getProfile());
         user.setRole("1");
         return user;
     }

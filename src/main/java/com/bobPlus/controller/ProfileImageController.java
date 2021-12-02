@@ -1,7 +1,8 @@
 package com.bobPlus.controller;
 
+import com.bobPlus.dto.UserDto;
 import com.bobPlus.service.ProfileImageService;
-import com.bobPlus.dto.SessionDto;
+import com.bobPlus.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 @RestController
 @RequiredArgsConstructor
 public class ProfileImageController {
+    private final TokenService tokenService;
 
     @Value("${profile.image.dir}")
     private String imgDir;
@@ -34,10 +36,10 @@ public class ProfileImageController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        SessionDto sessionDto = (SessionDto) req.getSession().getAttribute("session");
+        UserDto userDto = tokenService.getToken(req);
 
         try {
-            long result = imageService.uploadProfile(file, sessionDto.getUserId());
+            long result = imageService.uploadProfile(file, userDto.getId());
             resultMap.put("interCode", result);
             entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         } catch (IOException e) {

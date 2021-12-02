@@ -1,6 +1,7 @@
 package com.bobPlus.controller;
 
-import com.bobPlus.dto.SessionDto;
+import com.bobPlus.dto.UserDto;
+import com.bobPlus.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -16,11 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class ChatController {
 
+	private final TokenService tokenService;
+
 	@GetMapping("/bobs/chat/{roomId}")
 	public ModelAndView chat(ModelAndView modelAndView, HttpServletRequest req, HttpServletResponse resp, @PathVariable("roomId") int roomId) {
-		SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
+		UserDto userDto = tokenService.getToken(req);
 		modelAndView.addObject("room_id", roomId);
-		modelAndView.addObject("writer", sessionDTO.getUserId());
+		modelAndView.addObject("writer", userDto.getId());
 		//modelAndView.setViewName("room"); // 임시
 		modelAndView.setViewName("chat");
 		return modelAndView;

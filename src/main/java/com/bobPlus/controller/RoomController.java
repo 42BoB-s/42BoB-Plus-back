@@ -2,9 +2,10 @@ package com.bobPlus.controller;
 
 import com.bobPlus.dto.RoomDto;
 import com.bobPlus.dto.SearchRoomsRequestDto;
-import com.bobPlus.dto.SessionDto;
 import com.bobPlus.dto.UpdateTitleRequestDto;
+import com.bobPlus.dto.UserDto;
 import com.bobPlus.service.RoomService;
+import com.bobPlus.service.TokenService;
 import com.bobPlus.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ public class RoomController {
 
     private final UserService userService;
     private final RoomService roomService;
+    private final TokenService tokenService;
 
     // 방 생성
     @PostMapping("/room")
@@ -34,9 +36,9 @@ public class RoomController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
+        UserDto userDto = tokenService.getToken(req);
 
-        long result = roomService.createRoom(roomDTO, sessionDTO.getUserId());
+        long result = roomService.createRoom(roomDTO, userDto.getId());
 
         if (result < 0L) {
             resultMap.put("interCode", (int) result);
@@ -62,8 +64,8 @@ public class RoomController {
             return entity;
         }
 
-        SessionDto sessionDTO = (SessionDto) session.getAttribute("session");
-        List<RoomDto> roomDtoList = roomService.searchMyRooms(sessionDTO.getUserId());
+        UserDto userDto = tokenService.getToken(req);
+        List<RoomDto> roomDtoList = roomService.searchMyRooms(userDto.getId());
 
         resultMap.put("interCode", 1);
         resultMap.put("roomList", roomDtoList);
@@ -92,8 +94,8 @@ public class RoomController {
             roomDtoList = roomService.searchRooms(reqDto, pageable);
         }
         else {
-            SessionDto sessionDTO = (SessionDto) session.getAttribute("session");
-            roomDtoList = roomService.searchRooms(sessionDTO.getUserId(), reqDto, pageable);
+            UserDto userDto = tokenService.getToken(req);
+            roomDtoList = roomService.searchRooms(userDto.getId(), reqDto, pageable);
         }
 
         resultMap.put("interCode", 1);
@@ -108,9 +110,9 @@ public class RoomController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
+        UserDto userDto = tokenService.getToken(req);
 
-        long result = roomService.enterRoom(sessionDTO.getUserId(), roomid);
+        long result = roomService.enterRoom(userDto.getId(), roomid);
         if (result < 0L)
             entity = new ResponseEntity<>(resultMap, HttpStatus.FORBIDDEN);
         else
@@ -125,9 +127,9 @@ public class RoomController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
+        UserDto userDto = tokenService.getToken(req);
 
-        long result = roomService.exitRoom(sessionDTO.getUserId(), roomid);
+        long result = roomService.exitRoom(userDto.getId(), roomid);
         if (result < 0L)
             entity = new ResponseEntity<>(resultMap, HttpStatus.FORBIDDEN);
         else
@@ -143,9 +145,9 @@ public class RoomController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        SessionDto sessionDTO = (SessionDto) req.getSession(false).getAttribute("session");
+        UserDto userDto = tokenService.getToken(req);
 
-        long result = roomService.updateTitle(titleDto.getTitle(), roomid, sessionDTO.getUserId());
+        long result = roomService.updateTitle(titleDto.getTitle(), roomid, userDto.getId());
 
         if (result < 0L)
             entity = new ResponseEntity<>(resultMap, HttpStatus.FORBIDDEN);
