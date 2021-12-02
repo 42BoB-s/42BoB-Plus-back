@@ -12,12 +12,12 @@ public class bobsPlus {
         SpringApplication.run(bobsPlus.class, args);
     }
     
-//	private Connector httpToHttpsRedirectConnector() {
-//		Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-//		connector.setScheme("http");
-//		connector.setPort(8080);
-//		connector.setSecure(false);
-//		connector.setRedirectPort(8443);
-//		return connector;
-//	}
+	private Connector httpToHttpsRedirectConnector() {
+		Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+		connector.setScheme("http");
+		connector.setPort(8080);
+       	connector.setSecure(false);
+		connector.setRedirectPort(443);
+		return connector;
+	}
 }
