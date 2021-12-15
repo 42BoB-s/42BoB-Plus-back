@@ -25,7 +25,7 @@ public class HeadController {
     private final TokenService tokenService;
 
     @GetMapping("/bobs/header")
-    private ResponseEntity<HashMap<String, Object>> searchMyStat(HttpServletRequest req, HttpServletResponse resp)
+    private ResponseEntity<HashMap<String, Object>> getMyHeader(HttpServletRequest req, HttpServletResponse resp)
     {
         UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
