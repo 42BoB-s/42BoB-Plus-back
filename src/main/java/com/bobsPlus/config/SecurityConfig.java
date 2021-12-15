@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 
@@ -46,16 +47,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 http.addFilterBefore(new JwtAuthFilter(tokenService), UsernamePasswordAuthenticationFilter.class);
     }
 
+
     //https://howtolivelikehuman.tistory.com/191
     //https://taes-k.github.io/2019/12/05/spring-cors/ (추가필요해보임)
     @Bean
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
-        //configuration.setAllowedOrigins(Arrays.asList("https://42bobs.netlify.app"));
-        configuration.setAllowedOrigins(Arrays.asList("*")); // 임시
-        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
-        //configuration.setAllowedHeaders(Arrays.asList("Authorization"));
-        //configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(Arrays.asList("*")); // 추후 https://42bobs.netlify.app 로 변경 필요
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
