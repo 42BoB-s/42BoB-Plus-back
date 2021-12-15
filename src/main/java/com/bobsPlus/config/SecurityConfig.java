@@ -5,6 +5,7 @@ import com.bobsPlus.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -34,6 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authorizeRequests() // 시큐리티 처리에 HttpServletRequest 이용
+                    .antMatchers(HttpMethod.OPTIONS, "**").permitAll() // preflight
                     .antMatchers("/oauth2/authorization/**").permitAll() // 특정 경로 허용
                     .antMatchers("/login/oauth2/code/**").permitAll() // 특정 경로 허용
                     .antMatchers("/bobs/room/debug_random").permitAll()
