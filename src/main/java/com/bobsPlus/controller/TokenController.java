@@ -44,7 +44,7 @@ public class TokenController {
         String token = tokenService.generateToken(userDto, "USER");
         HashMap<String, String> auth = new HashMap<>();
         auth.put("Authorization", token);
-        entity = new ResponseEntity<>(auth, HttpStatus.FORBIDDEN);
+        entity = new ResponseEntity<>(auth, HttpStatus.OK);
         return entity;
     }
 
