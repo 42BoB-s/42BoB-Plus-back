@@ -45,7 +45,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("{}", token);
 
         // userId 가 DB 에 없다면 user 정보를 등록 (에러로 인해 임시 주석)
-        // loginService.processNewUser(userDto);
+         loginService.processNewUser(userDto);
 
         //User DB에 refreshToken 저장필요 (accessToken은 저장하지 않음) -> accessToken 만료 시 재발급을 위해 사용
         //추후 작업 예정

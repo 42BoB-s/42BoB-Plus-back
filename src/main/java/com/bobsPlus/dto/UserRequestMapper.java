@@ -8,9 +8,9 @@ public class UserRequestMapper {
     public UserDto toDto(OAuth2User oAuth2User) {
         var attributes = oAuth2User.getAttributes();
         return UserDto.builder()
-                .id((String) attributes.get("id"))
+                .id((String) attributes.get("login"))
                 .email((String) attributes.get("email"))
-                .profile((String) attributes.get("profile"))
+                .profile((String) attributes.get("image_url"))
                 .build();
     }
 }

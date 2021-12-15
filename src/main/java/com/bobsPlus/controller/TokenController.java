@@ -32,14 +32,14 @@ public class TokenController {
      */
 
     //임시 토큰 발급
-    @GetMapping("/bobs/header")
+    @GetMapping("/token/tmp")
     public ResponseEntity<HashMap<String, String>> tmpToken()
     {
         ResponseEntity<HashMap<String, String>> entity;
         UserDto userDto = UserDto.builder()
-                .id("testUser")
-                .email("testUser@test.com")
-                .profile("https://www.google.co.jp/logos/doodles/2021/seasonal-holidays-2021-6753651837109324.3-ladc.gif")
+                .id("dev")
+                .email("dev@student.42seoul.kr")
+                .profile("https://profile.intra.42.fr/assets/42_logo_black-684989d43d629b3c0ff6fd7e1157ee04db9bb7a73fba8ec4e01543d650a1c607.png")
                 .build();
         String token = tokenService.generateToken(userDto, "USER");
         HashMap<String, String> auth = new HashMap<>();
