@@ -51,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userInfoEndpoint().userService(oAuth2UserService);
     }
 
+
     //https://howtolivelikehuman.tistory.com/191
     //https://taes-k.github.io/2019/12/05/spring-cors/ (추가필요해보임)
     @Bean
