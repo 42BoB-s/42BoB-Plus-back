@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authorizeRequests() // 시큐리티 처리에 HttpServletRequest 이용
-                    .antMatchers(HttpMethod.OPTIONS, "**").permitAll() // preflight
+                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight
                     .antMatchers("/oauth2/authorization/**").permitAll() // 특정 경로 허용
                     .antMatchers("/login/oauth2/code/**").permitAll() // 특정 경로 허용
                     .antMatchers("/bobs/room/debug_random").permitAll()
