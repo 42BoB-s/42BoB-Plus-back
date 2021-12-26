@@ -32,7 +32,7 @@ public class RoomController {
 
     // 방 생성
     @PostMapping("/room")
-    public ResponseEntity<HashMap<String, Object>> createRoom(HttpServletRequest req, RoomDto roomDTO) {
+    public ResponseEntity<HashMap<String, Object>> createRoom(HttpServletRequest req, @RequestBody RoomDto roomDTO) {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
