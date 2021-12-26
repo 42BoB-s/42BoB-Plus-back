@@ -45,6 +45,7 @@ public class RoomController {
             entity = new ResponseEntity<>(resultMap, HttpStatus.FORBIDDEN);
         } else {
             resultMap.put("interCode", 1);
+            resultMap.put("roomId", (int) result);
             entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         }
         return entity;
