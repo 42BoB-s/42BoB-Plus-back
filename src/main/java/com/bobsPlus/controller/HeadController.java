@@ -3,6 +3,7 @@ package com.bobsPlus.controller;
 import com.bobsPlus.dto.StatDto;
 import com.bobsPlus.dto.UserDto;
 import com.bobsPlus.entity.User;
+import com.bobsPlus.mapper.UserMapper;
 import com.bobsPlus.repository.UserRepository;
 import com.bobsPlus.service.TokenService;
 import com.bobsPlus.service.UserService;
@@ -21,19 +22,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HeadController {
 
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final TokenService tokenService;
 
     @GetMapping("/bobs/header")
     private ResponseEntity<HashMap<String, Object>> getMyHeader(HttpServletRequest req, HttpServletResponse resp)
     {
-        UserDto userDto = tokenService.getToken(req);
+        UserDto userTokenDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        Optional<User> user = userRepository.findById(userDto.getId());
+        Optional<User> user = userRepository.findById(userTokenDto.getId());
         if (user.isPresent()) {
             resultMap.put("interCode", 1);
-            resultMap.put("user", user.get());
+            UserDto userDto = userMapper.toDto(user.get());
+            userDto.setEmail(userTokenDto.getEmail());
+            resultMap.put("user", userDto);
             entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         } else {
             resultMap.put("interCode", -20); // DB에 계정이 존재하지 않는 경우 (임시)
