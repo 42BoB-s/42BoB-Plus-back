@@ -45,6 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/login/oauth2/code/**").permitAll() // 특정 경로 허용
                     .antMatchers("/bobs/room/debug_random").permitAll()
                     .antMatchers("/token/**").permitAll() // 특정 경로 허용
+                    .antMatchers("/bobs/chat/**").permitAll() // (임시)
                     .anyRequest().authenticated() // 어떠한 요청이든지 인증되어야 한다
                 .and()
                     .exceptionHandling()
