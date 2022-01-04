@@ -1,9 +1,7 @@
 package com.bobsPlus.controller;
 
-import com.bobsPlus.dto.RoomDto;
-import com.bobsPlus.dto.SearchRoomsRequestDto;
-import com.bobsPlus.dto.UpdateTitleRequestDto;
-import com.bobsPlus.dto.UserDto;
+import com.bobsPlus.dto.*;
+import com.bobsPlus.entity.Room;
 import com.bobsPlus.service.RoomService;
 import com.bobsPlus.service.TokenService;
 import com.bobsPlus.service.UserService;
@@ -14,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +28,33 @@ public class RoomController {
     private final UserService userService;
     private final RoomService roomService;
     private final TokenService tokenService;
+
+    // 특정 방 조회
+    @GetMapping("/room/info")
+    public ResponseEntity<HashMap<String, Object>> getRoomInfo(HttpServletRequest req, HttpServletResponse resp, @RequestParam long roomId) {
+        ResponseEntity<HashMap<String, Object>> entity;
+        HashMap<String, Object> resultMap = new HashMap<>();
+        UserDto userDto = tokenService.getToken(req);
+
+        SearchRoomResponseDto roomDto = roomService.getRoomInfo(roomId);
+        if (roomDto == null)
+        {
+            resultMap.put("interCode", -3); // 방이 존재 하지 않음
+            entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+        }
+        else if (!roomDto.getParticipants().contains(userDto.getId()))
+        {
+            resultMap.put("interCode", -8); // 방에 입장하지 않은 유저가 해당 방 정보를 조회 시
+            entity = new ResponseEntity<>(resultMap, HttpStatus.FORBIDDEN);
+        }
+        else
+        {
+            resultMap.put("interCode", roomId);
+            resultMap.put("room", roomDto);
+            entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
+        }
+        return entity;
+    }
 
     // 방 생성
     @PostMapping("/room")
@@ -57,15 +83,14 @@ public class RoomController {
 
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("session") == null) {
+        UserDto userDto = tokenService.getToken(req);
+        if (userDto == null) {
             resultMap.put("interCode", 1);
             resultMap.put("roomList", null);
             entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
             return entity;
         }
 
-        UserDto userDto = tokenService.getToken(req);
         List<RoomDto> roomDtoList = roomService.searchMyRooms(userDto.getId());
 
         resultMap.put("interCode", 1);
@@ -90,12 +115,11 @@ public class RoomController {
         }
 
         List<RoomDto> roomDtoList;
-        HttpSession session = req.getSession(false);
-        if (req.getSession(false) == null || session.getAttribute("session") == null) {
+        UserDto userDto = tokenService.getToken(req);
+        if (userDto == null) {
             roomDtoList = roomService.searchRooms(reqDto, pageable);
         }
         else {
-            UserDto userDto = tokenService.getToken(req);
             roomDtoList = roomService.searchRooms(userDto.getId(), reqDto, pageable);
         }
 

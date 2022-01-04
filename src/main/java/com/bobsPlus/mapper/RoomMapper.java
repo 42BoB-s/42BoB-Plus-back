@@ -1,5 +1,6 @@
 package com.bobsPlus.mapper;
 
+import com.bobsPlus.dto.SearchRoomResponseDto;
 import com.bobsPlus.service.UserService;
 import com.bobsPlus.dto.RoomDto;
 import com.bobsPlus.entity.Participant;
@@ -65,6 +66,28 @@ public class RoomMapper {
         // 방 참여자 List<User> 로 변환
         for (Participant part : room.getParticipantList()) {
             roomDTO.getParticipants().add(userMapper.convertToUserDto(part.getUser()));
+        }
+        return roomDTO;
+    }
+
+    // Room 객체를 SearchRoomResponseDto 로 변환
+    public SearchRoomResponseDto convertToSearchRoomResponseDto(Room room) {
+        SearchRoomResponseDto roomDTO = new SearchRoomResponseDto();
+        roomDTO.setId(room.getId());
+        roomDTO.setTitle(room.getTitle());
+        roomDTO.setMeetTime(room.getMeetTime().format(formatter));
+        roomDTO.setLocation(room.getLocation().name());
+        roomDTO.setOwner(userMapper.convertToUserDto(room.getOwner()).getId());
+        roomDTO.setCapacity(room.getCapacity());
+        roomDTO.setStatus(room.getStatus().name());
+        roomDTO.setAnnouncement(room.getAnnouncement());
+        // menu 이름 string 으로 변환
+        for(RoomMenu roomMenu : room.getRoomMenuList()) {
+            roomDTO.getMenus().add(roomMenu.getMenu().getName().toString());
+        }
+        // 방 참여자 List<String> 로 변환
+        for (Participant part : room.getParticipantList()) {
+            roomDTO.getParticipants().add(userMapper.convertToUserDto(part.getUser()).getId());
         }
         return roomDTO;
     }

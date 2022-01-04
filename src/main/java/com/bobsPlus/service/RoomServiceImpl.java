@@ -1,5 +1,6 @@
 package com.bobsPlus.service;
 
+import com.bobsPlus.dto.SearchRoomResponseDto;
 import com.bobsPlus.entity.Room;
 import com.bobsPlus.mapper.RoomMapper;
 import com.bobsPlus.repository.RoomRepository;
@@ -25,6 +26,15 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final UserService userService;
     private final ParticipantService partService;
+
+    public SearchRoomResponseDto getRoomInfo(long roomId) {
+        Optional<Room> room = roomRepository.findById(roomId);
+        if (room.isEmpty())
+            return null;
+        else {
+            return roomMapper.convertToSearchRoomResponseDto(room.get());
+        }
+    }
 
     public Long createRoom(RoomDto roomDTO, String userId) {
         LocalDateTime inputTime = LocalDateTime.parse(roomDTO.getMeetTime(), utils.formatter);
