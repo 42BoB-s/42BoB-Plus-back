@@ -70,24 +70,24 @@ public class MyPageController {
     }
 
     @PatchMapping("/bobs/mypage/ban/{userId}")
-    private ResponseEntity<HashMap<String, Object>> addBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
+    private ResponseEntity<HashMap<String, Object>> addBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId, @RequestBody String name)
     {
         UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        long result = userService.addBan(userDto.getId(),userId);
+        long result = userService.addBan(userDto.getId(),name);
         resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }
 
     @DeleteMapping("/bobs/mypage/ban/{userId}")
-    private ResponseEntity<HashMap<String, Object>> deleteBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
+    private ResponseEntity<HashMap<String, Object>> deleteBan(HttpServletRequest req, HttpServletResponse resp, @RequestBody String name)
     {
         UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        long result = userService.deleteBan(userDto.getId(),userId);
+        long result = userService.deleteBan(userDto.getId(),name);
         resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;

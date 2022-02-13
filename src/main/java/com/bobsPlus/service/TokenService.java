@@ -1,8 +1,8 @@
 package com.bobsPlus.service;
 
 import com.bobsPlus.dto.UserDto;
-import com.bobsPlus.dto.UserDto;
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,9 @@ import java.util.regex.Pattern;
 
 @Service
 public class TokenService {
-    private String secretKey = "bPdSgVkYp3s6v9y$B&E)H@McQfTjWmZq";
+
+    @Value("${jwtSecret}")
+    private String secretKey;
 
     @PostConstruct
     protected void init() {
