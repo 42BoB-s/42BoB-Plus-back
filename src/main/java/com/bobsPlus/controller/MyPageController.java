@@ -75,6 +75,8 @@ public class MyPageController {
         UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
+        System.out.println("dest : " + userDto.getId());
+        System.out.println("src : " + name);
         long result = userService.addBan(userDto.getId(),name);
         resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
