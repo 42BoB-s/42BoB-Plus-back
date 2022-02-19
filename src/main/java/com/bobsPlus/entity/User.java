@@ -16,16 +16,19 @@ import java.util.List;
 @Entity
 @NamedNativeQuery(
         name = "searchStatQuery",
-        query = "select (select count(room_id) from participant where user_id = :id) as succeedStat, " +
-                " (select location FROM  (select * from participant where user_id = :id ) p" +
-                " left join room r on r.id = p.room_id" +
-                " group by location order by count(*) desc LIMIT 1) as locationStat," +
-                " (select m.name from (select * from participant where user_id = :id ) pp" +
-                    " left join room_menu rm on rm.room_id=pp.room_id" +
-                    " join menu m on rm.menu_id = m.id group by m.name order by count(*) desc LIMIT 1) as menusStat," +
-                " (select user_id from (select room_id from participant where user_id = :id) p1" +
-                    " join (select * from participant where user_id != :id) p2 on p1.room_id = p2.room_id" +
-                    " group by user_id order by count(*) desc limit 1) as name",
+        query = "WITH UserSucceedRoom AS(" +
+                "    select room_id, location" +
+                "    from (select room_id from participant where user_id = :id)p" +
+                "    left join room on p.room_id = room.id where status = 'succeed'" +
+                "),NotUserSucceedRoom AS(" +
+                "    select room_id, location, user_id" +
+                "    from (select room_id, user_id from participant where user_id != :id )p" +
+                "    left join room on p.room_id = room.id where status = 'succeed')" +
+                "   select (select count(*) from UserSucceedRoom) as succeedStat, (select location from UserSucceedRoom group by location order by count(*) desc LIMIT 1) as locationStat," +
+                "       (select name from UserSucceedRoom left join room_menu on UserSucceedRoom.room_id = room_menu.room_id left join menu m on room_menu.menu_id = m.id group by menu_id order by count(*) desc LIMIT 1) as menusStat," +
+                "       (select NotUserSucceedRoom.user_id from UserSucceedRoom" +
+                "            join NotUserSucceedRoom on UserSucceedRoom.room_id = NotUserSucceedRoom.room_id" +
+                "       group by user_id order by count(*) desc limit 1)as name",
         resultSetMapping = "StatDtoMapping"
 )
 @SqlResultSetMapping(
