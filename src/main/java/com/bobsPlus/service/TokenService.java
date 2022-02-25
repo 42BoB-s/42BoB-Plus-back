@@ -1,22 +1,30 @@
 package com.bobsPlus.service;
 
+import com.bobsPlus.dto.TokenDto;
 import com.bobsPlus.dto.UserDto;
 import com.bobsPlus.dto.UserDto;
+import com.bobsPlus.entity.Token;
+import com.bobsPlus.mapper.TokenMapper;
+import com.bobsPlus.repository.TokenRepository;
 import io.jsonwebtoken.*;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import javax.transaction.Transactional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class TokenService {
+    private final TokenRepository tokenRepository;
+    private final TokenMapper tokenMapper;
     private String secretKey = "bPdSgVkYp3s6v9y$B&E)H@McQfTjWmZq";
 
     @PostConstruct
@@ -25,8 +33,11 @@ public class TokenService {
     }
 
     //String uid만 하면 id만 들어감 email, image_url도 포함 시키도록 수정
-    public String generateToken(UserDto userDto, String role) {
-        long tokenPeriod = 1000L * 60L * 60L * 24L; // 1일
+    public TokenDto generateToken(UserDto userDto, String role) {
+        //long accessTokenPeriod = 1000L * 30L ; //30초
+        long accessTokenPeriod = 1000L * 60L * 60L * 24L; // 1일
+        //long refreshTokenPeriod = 1000L * 60L; // 1분
+        long refreshTokenPeriod = 1000L * 60L * 60L * 24L * 30; // 30일
 
         //Header
         Map<String, Object> headers = new HashMap<>();
@@ -41,14 +52,26 @@ public class TokenService {
         claims.put("role", role);
 
         Date now = new Date();
-        return "Bearer " + Jwts.builder()
-                            .setHeader(headers)
-                            .setClaims(claims)
-                            .setSubject("user-auth")
-                            .setIssuedAt(now)
-                            .setExpiration(new Date(now.getTime() + tokenPeriod))
-                            .signWith(SignatureAlgorithm.HS256, secretKey)
-                            .compact();
+        TokenDto tokenDto = new TokenDto();
+        // tokens[0] : accessToken
+        tokenDto.setAccessToken("Bearer " + Jwts.builder()
+                .setHeader(headers)
+                .setClaims(claims)
+                .setSubject("user-auth")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + accessTokenPeriod))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact());
+        // tokens[1] : refreshToken
+        tokenDto.setRefreshToken("Bearer " + Jwts.builder()
+                .setHeader(headers)
+                .setClaims(claims)
+                .setSubject("user-auth")
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + refreshTokenPeriod))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact());
+        return tokenDto;
     }
 
     //컨트롤러에서 이용할 예정
@@ -89,6 +112,33 @@ public class TokenService {
             System.out.println("# =====Error=====");
             return false;
         }
+    }
+
+    public void saveRefreshToken(TokenDto tokenDto)
+    {
+        tokenDto.setId(tokenRepository.count());
+        tokenRepository.save(tokenMapper.toEntity(tokenDto));
+    }
+
+    public String NewAccessTokenToken(String accessToken)
+    {
+        Optional<Token> token = tokenRepository.findByAccessToken(accessToken);
+        if (token.isPresent()) {
+            String refreshToken = token.get().getRefreshToken().replaceAll("^Bearer( )*", "");;
+            if (verifyToken(refreshToken)) {
+                UserDto userDto = UserDto.builder()
+                        .id(getId(refreshToken))
+                        .email(getEmail(refreshToken))
+                        .profile(getImageUrl(refreshToken))
+                        .build();
+                TokenDto tokenDto = generateToken(userDto, "USER");
+                tokenDto.setRefreshToken("Bearer " + refreshToken);
+                //accessToken db저장 (이러면 발급할때마다 저장해줘야하는거 아니야...?)
+                saveRefreshToken(tokenDto); // 저장이 아니라 기존 리프레쉬 토큰 행에 업데이트 해주는 편이 데이터가 쌓였을때 좋을꺼 같음
+                return tokenDto.getAccessToken();
+            }
+        }
+        return null;
     }
 
     public Claims getClaims(String token) {

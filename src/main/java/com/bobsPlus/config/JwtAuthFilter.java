@@ -28,6 +28,7 @@ public class JwtAuthFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         String authorization = ((HttpServletRequest)request).getHeader("Authorization");
+        //access,refresh 토큰 무결성 체크
         // Authorized Bearer
         if (authorization != null)
         {

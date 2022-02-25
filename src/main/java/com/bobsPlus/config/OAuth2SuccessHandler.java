@@ -1,8 +1,10 @@
 package com.bobsPlus.config;
 
+import com.bobsPlus.dto.TokenDto;
 import com.bobsPlus.dto.UserDto;
 import com.bobsPlus.dto.UserRequestMapper;
 import com.bobsPlus.mapper.UserMapper;
+import com.bobsPlus.repository.TokenRepository;
 import com.bobsPlus.repository.UserRepository;
 import com.bobsPlus.service.LoginService;
 import com.bobsPlus.service.TokenService;
@@ -41,14 +43,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         UserDto userDto = userRequestMapper.toDto(oAuth2User);
 
         // 로그인 시 토큰 발행
-        String token = tokenService.generateToken(userDto, "USER");
-        log.info("{}", token);
+        TokenDto tokenDto = tokenService.generateToken(userDto, "USER");
+        log.info("{}", tokenDto);
 
         // userId 가 DB 에 없다면 user 정보를 등록 (에러로 인해 임시 주석)
-         loginService.processNewUser(userDto);
+        loginService.processNewUser(userDto);
 
-        //User DB에 refreshToken 저장필요 (accessToken은 저장하지 않음) -> accessToken 만료 시 재발급을 위해 사용
-        //추후 작업 예정
+        //User DB에 refreshToken 저장필요 (accessToken는 무결성 검사용)
+        tokenService.saveRefreshToken(tokenDto);
 
         //토큰 전달
         //response.setContentType("application/json;charset=UTF-8");
@@ -56,6 +58,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         //커스텀 헤더를 리다이렉트로 전달하는 것은 불가.
         //일단 get 파라미터로 넘기도록 하였음.
-        getRedirectStrategy().sendRedirect(request, response, "https://42bobs.netlify.app?Authorization="+token);
+        getRedirectStrategy().sendRedirect(request, response, "https://42bobs.netlify.app?Authorization="+ tokenDto.getAccessToken());
     }
 }
