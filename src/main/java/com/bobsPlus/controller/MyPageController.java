@@ -1,5 +1,6 @@
 package com.bobsPlus.controller;
 
+import com.bobsPlus.dto.BanRequestDto;
 import com.bobsPlus.dto.UserDto;
 import com.bobsPlus.service.TokenService;
 import com.bobsPlus.service.UserService;
@@ -70,24 +71,24 @@ public class MyPageController {
     }
 
     @PatchMapping("/bobs/mypage/ban/{userId}")
-    private ResponseEntity<HashMap<String, Object>> addBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
+    private ResponseEntity<HashMap<String, Object>> addBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId, @RequestBody BanRequestDto nameDto)
     {
         UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        long result = userService.addBan(userDto.getId(),userId);
+        long result = userService.addBan(userDto.getId(),   nameDto.getName());
         resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;
     }
 
     @DeleteMapping("/bobs/mypage/ban/{userId}")
-    private ResponseEntity<HashMap<String, Object>> deleteBan(HttpServletRequest req, HttpServletResponse resp, @PathVariable String userId)
+    private ResponseEntity<HashMap<String, Object>> deleteBan(HttpServletRequest req, HttpServletResponse resp, @RequestBody BanRequestDto nameDto)
     {
         UserDto userDto = tokenService.getToken(req);
         ResponseEntity<HashMap<String, Object>> entity;
         HashMap<String, Object> resultMap = new HashMap<>();
-        long result = userService.deleteBan(userDto.getId(),userId);
+        long result = userService.deleteBan(userDto.getId(), nameDto.getName());
         resultMap.put("interCode", (int) result);
         entity = new ResponseEntity<>(resultMap, HttpStatus.OK);
         return entity;

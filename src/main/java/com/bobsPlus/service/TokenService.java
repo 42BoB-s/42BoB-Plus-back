@@ -6,9 +6,12 @@ import com.bobsPlus.dto.UserDto;
 import com.bobsPlus.entity.Token;
 import com.bobsPlus.mapper.TokenMapper;
 import com.bobsPlus.repository.TokenRepository;
+import com.bobsPlus.mapper.TokenMapper;
+import com.bobsPlus.repository.TokenRepository;
 import io.jsonwebtoken.*;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,8 @@ import java.util.regex.Pattern;
 public class TokenService {
     private final TokenRepository tokenRepository;
     private final TokenMapper tokenMapper;
-    private String secretKey = "bPdSgVkYp3s6v9y$B&E)H@McQfTjWmZq";
+    @Value("${jwtSecret}")
+    private String secretKey;
 
     @PostConstruct
     protected void init() {
